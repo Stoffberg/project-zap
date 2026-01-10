@@ -93,7 +93,7 @@ No boilerplate. No configuration hell. Just `bun install` and start building.
 
 ```bash
 # Clone the repository
-git clone https://github.com/stoffberg/next.git my-app
+git clone https://github.com/Stoffberg/project-zap.git my-app
 cd my-app
 
 # Install dependencies
