@@ -1,6 +1,13 @@
 import { paginationOptsValidator } from "convex/server";
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import {
+	DEMO_DEPARTMENTS,
+	DEMO_FIRST_NAMES,
+	DEMO_LAST_NAMES,
+	DEMO_ROLES,
+	DEMO_STATUSES,
+} from "./lib/demoData";
 
 // ============================================
 // QUERIES
@@ -87,133 +94,20 @@ export const seed = mutation({
 			return 0;
 		}
 
-		const departments = [
-			"Engineering",
-			"Design",
-			"Marketing",
-			"Sales",
-			"Support",
-			"HR",
-			"Finance",
-		];
-		const roles = ["admin", "moderator", "user"] as const;
-		const statuses = ["active", "inactive", "pending"] as const;
-
-		const firstNames = [
-			"Alice",
-			"Bob",
-			"Carol",
-			"David",
-			"Eva",
-			"Frank",
-			"Grace",
-			"Henry",
-			"Ivy",
-			"Jack",
-			"Kate",
-			"Liam",
-			"Mia",
-			"Noah",
-			"Olivia",
-			"Peter",
-			"Quinn",
-			"Ruby",
-			"Sam",
-			"Tara",
-			"Uma",
-			"Victor",
-			"Wendy",
-			"Xavier",
-			"Yara",
-			"Zack",
-			"Anna",
-			"Ben",
-			"Clara",
-			"Dan",
-			"Emma",
-			"Felix",
-			"Gina",
-			"Hugo",
-			"Iris",
-			"James",
-			"Kelly",
-			"Leo",
-			"Maya",
-			"Nick",
-			"Ora",
-			"Paul",
-			"Quincy",
-			"Rosa",
-			"Steve",
-			"Tina",
-			"Uri",
-			"Vera",
-			"Will",
-			"Xena",
-			"Yuri",
-			"Zoe",
-			"Adam",
-			"Beth",
-			"Carl",
-			"Diana",
-			"Eric",
-			"Fiona",
-			"George",
-			"Helen",
-			"Ivan",
-			"Julia",
-			"Kevin",
-			"Luna",
-		];
-
-		const lastNames = [
-			"Smith",
-			"Johnson",
-			"Williams",
-			"Brown",
-			"Jones",
-			"Garcia",
-			"Miller",
-			"Davis",
-			"Rodriguez",
-			"Martinez",
-			"Hernandez",
-			"Lopez",
-			"Gonzalez",
-			"Wilson",
-			"Anderson",
-			"Thomas",
-			"Taylor",
-			"Moore",
-			"Jackson",
-			"Martin",
-			"Lee",
-			"Perez",
-			"Thompson",
-			"White",
-			"Harris",
-			"Sanchez",
-			"Clark",
-			"Ramirez",
-			"Lewis",
-			"Robinson",
-			"Walker",
-			"Young",
-		];
-
 		const users = [];
 		for (let i = 0; i < 100; i++) {
-			const firstName = firstNames[i % firstNames.length];
-			const lastName = lastNames[Math.floor(i / 2) % lastNames.length];
+			const firstName = DEMO_FIRST_NAMES[i % DEMO_FIRST_NAMES.length];
+			const lastName =
+				DEMO_LAST_NAMES[Math.floor(i / 2) % DEMO_LAST_NAMES.length];
 			const name = `${firstName} ${lastName}`;
 			const email = `${firstName.toLowerCase()}.${lastName.toLowerCase()}${i}@example.com`;
 
 			users.push({
 				name,
 				email,
-				role: roles[i % roles.length],
-				status: statuses[Math.floor(Math.random() * 3)],
-				department: departments[i % departments.length],
+				role: DEMO_ROLES[i % DEMO_ROLES.length],
+				status: DEMO_STATUSES[Math.floor(Math.random() * 3)],
+				department: DEMO_DEPARTMENTS[i % DEMO_DEPARTMENTS.length],
 			});
 		}
 
