@@ -29,7 +29,7 @@ cd my-app
 bun install
 
 # 3. Set up Convex
-npx convex dev  # Creates .env.local automatically
+bunx convex dev  # Creates .env.local automatically
 
 # 4. Add WorkOS client ID to .env.local
 echo "VITE_WORKOS_CLIENT_ID=your_client_id" >> .env.local
@@ -56,7 +56,7 @@ Open [localhost:3000](http://localhost:3000)
 1. Fork this repo
 2. Go to [vercel.com/new](https://vercel.com/new)
 3. Import your fork
-4. Set **Build Command**: `npx convex deploy --cmd 'bun run build'`
+4. Set **Build Command**: `bunx convex deploy --cmd 'bun run build'`
 5. Add the 2 environment variables
 6. Deploy
 
@@ -112,8 +112,9 @@ convex/
 |---------|-------------|
 | `bun dev` | Start dev server |
 | `bun build` | Production build |
-| `bun lint` | Lint code |
-| `npx convex dev` | Start Convex |
+| `bun run lint` | Lint code |
+| `bun run typecheck` | Type check |
+| `bunx convex dev` | Start Convex |
 
 ---
 

@@ -1,13 +1,25 @@
+# Dependencies
 node_modules
-.DS_Store
+
+# Build outputs
 dist
 dist-ssr
-*.local
-count.txt
-.env
 .nitro
 .tanstack
 .wrangler
 .output
 .vinxi
+
+# Environment
+*.local
+.env
+
+# Lock files (we use bun)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Misc
+.DS_Store
+count.txt
 todos.json

@@ -1,6 +1,19 @@
 # Project Zap
 
 > **Stack**: TanStack Start + Convex + WorkOS + shadcn/ui
+> **Package Manager**: bun (NOT npm/yarn/pnpm)
+
+## Commands
+```bash
+bun install          # Install dependencies
+bun dev              # Start dev server
+bun build            # Production build
+bun run typecheck    # Type check
+bun run lint         # Lint with auto-fix
+bun run check        # Lint + format with auto-fix
+bunx convex dev      # Start Convex backend
+bunx shadcn@latest add [component]  # Add UI component
+```
 
 ## Build Order
 1. Schema → `convex/schema.ts`
