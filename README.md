@@ -196,10 +196,22 @@ bunx shadcn@latest add data-table
 
 ### Vercel (Recommended)
 
-1. Push to GitHub
-2. Import in Vercel
-3. Add environment variables
-4. Deploy
+Deploying to Vercel? You only need **2 environment variables**:
+
+| Variable | Description | Where to get it |
+|----------|-------------|-----------------|
+| `CONVEX_DEPLOY_KEY` | Convex production deploy key | [Convex Dashboard](https://dashboard.convex.dev) → Project Settings → Generate Production Deploy Key |
+| `VITE_WORKOS_CLIENT_ID` | WorkOS client ID | [WorkOS Dashboard](https://dashboard.workos.com) → API Keys |
+
+**Steps:**
+
+1. Fork/clone this repo
+2. Import to [Vercel](https://vercel.com/new)
+3. Set build command: `npx convex deploy --cmd 'bun run build'`
+4. Add the 2 environment variables above
+5. Deploy
+
+That's it. Convex URL is automatically set during build.
 
 ### Other Platforms
 
@@ -215,11 +227,20 @@ The output in `dist/` can be deployed to any static hosting or Node.js platform.
 
 ## Environment Variables
 
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `VITE_CONVEX_URL` | Convex deployment URL | Yes |
-| `CONVEX_DEPLOYMENT` | Convex deployment name | Yes |
-| `VITE_WORKOS_CLIENT_ID` | WorkOS client ID | Yes |
+### For Vercel/Production
+
+| Variable | Description |
+|----------|-------------|
+| `CONVEX_DEPLOY_KEY` | Deploy key from Convex Dashboard |
+| `VITE_WORKOS_CLIENT_ID` | WorkOS client ID |
+
+### For Local Development
+
+| Variable | Description |
+|----------|-------------|
+| `VITE_CONVEX_URL` | Your Convex deployment URL |
+| `CONVEX_DEPLOYMENT` | Convex deployment name |
+| `VITE_WORKOS_CLIENT_ID` | WorkOS client ID |
 
 ---
 
