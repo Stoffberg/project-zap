@@ -23,30 +23,44 @@
 
 <p align="center">
   <a href="#quick-start">Quick Start</a> •
+  <a href="#workos-setup">WorkOS Setup</a> •
   <a href="#deploy-to-vercel">Deploy</a> •
-  <a href="#whats-included">What's Included</a> •
-  <a href="#project-structure">Structure</a>
+  <a href="#whats-included">What's Included</a>
 </p>
 
 ---
 
 ## Quick Start
 
+### Prerequisites
+
+- [Bun](https://bun.sh) installed
+- A [WorkOS account](https://workos.com/sign-up) (free tier available)
+- A [Convex account](https://convex.dev) (free tier available)
+
+### 1. Clone & Install
+
 ```bash
-# 1. Clone
 git clone https://github.com/Stoffberg/project-zap.git my-app
 cd my-app
-
-# 2. Install
 bun install
+```
 
-# 3. Set up Convex
-bunx convex dev  # Creates .env.local automatically
+### 2. Set up Convex
 
-# 4. Add WorkOS client ID to .env.local
-echo "VITE_WORKOS_CLIENT_ID=your_client_id" >> .env.local
+```bash
+bunx convex dev
+```
 
-# 5. Run
+This creates a new Convex project and generates `.env.local` with your `CONVEX_DEPLOYMENT` and `VITE_CONVEX_URL`.
+
+### 3. Set up WorkOS
+
+Follow the [WorkOS Setup](#workos-setup) section below to configure authentication.
+
+### 4. Run
+
+```bash
 bun dev
 ```
 
@@ -54,25 +68,87 @@ Open [localhost:3000](http://localhost:3000)
 
 ---
 
+## WorkOS Setup
+
+### Step 1: Create a WorkOS Account
+
+Sign up at [workos.com/sign-up](https://signin.workos.com/sign-up).
+
+### Step 2: Set up AuthKit
+
+1. In the WorkOS Dashboard, go to **Authentication** → **AuthKit**
+2. Click **Set up AuthKit**
+3. Select **Use AuthKit's customizable hosted UI**
+4. Complete the setup wizard
+5. Set the **Redirect URI** to `http://localhost:3000/callback`
+
+### Step 3: Configure CORS
+
+1. Go to **Authentication** → **Sessions** → **Cross-Origin Resource Sharing (CORS)**
+2. Click **Manage**
+3. Add `http://localhost:3000` for development
+4. Add your production domain when deploying
+
+### Step 4: Get Your Credentials
+
+From the [WorkOS Dashboard](https://dashboard.workos.com):
+
+1. Go to **API Keys**
+2. Copy your **Client ID** (format: `client_01XXXXXX`)
+
+### Step 5: Configure Environment Variables
+
+Add to your `.env.local`:
+
+```bash
+# Frontend (Vite)
+VITE_WORKOS_CLIENT_ID=client_01XXXXXXXXXXXXXXXXXXXXXX
+
+# Convex backend (for JWT validation)
+WORKOS_CLIENT_ID=client_01XXXXXXXXXXXXXXXXXXXXXX
+```
+
+**Note:** Both variables use the same Client ID value.
+
+### Step 6: Set Convex Environment Variable
+
+1. Go to your [Convex Dashboard](https://dashboard.convex.dev)
+2. Select your project → **Settings** → **Environment Variables**
+3. Add `WORKOS_CLIENT_ID` with your Client ID
+
+### Step 7: Deploy Auth Config
+
+```bash
+bunx convex dev
+```
+
+This syncs `convex/auth.config.ts` to your Convex backend.
+
+---
+
 ## Deploy to Vercel
 
-**You need 2 environment variables:**
+### Environment Variables
 
 | Variable | Get it from |
 |----------|-------------|
 | `CONVEX_DEPLOY_KEY` | [Convex Dashboard](https://dashboard.convex.dev) → Settings → Deploy Keys |
 | `VITE_WORKOS_CLIENT_ID` | [WorkOS Dashboard](https://dashboard.workos.com) → API Keys |
 
-**Steps:**
+### Steps
 
 1. Fork this repo
 2. Go to [vercel.com/new](https://vercel.com/new)
 3. Import your fork
 4. Set **Build Command**: `bunx convex deploy --cmd 'bun run build'`
-5. Add the 2 environment variables
+5. Add the environment variables above
 6. Deploy
 
-> The Convex URL is set automatically during build.
+### Production WorkOS Configuration
+
+1. In WorkOS Dashboard, add your production domain to the **CORS** settings
+2. Add `https://your-domain.com/callback` as a **Redirect URI**
+3. Set `WORKOS_CLIENT_ID` in your Convex production deployment
 
 ---
 
@@ -91,8 +167,9 @@ Open [localhost:3000](http://localhost:3000)
 - 30+ UI components (buttons, forms, tables, dialogs, etc.)
 - Dark mode with system preference support
 - Server-side data table with pagination & search
-- User authentication flow
+- User authentication flow with WorkOS AuthKit
 - Dashboard layout with sidebar navigation
+- Todo app with file attachments (Convex storage demo)
 - Landing page template
 
 ---
@@ -101,20 +178,37 @@ Open [localhost:3000](http://localhost:3000)
 
 ```
 src/
-├── routes/              # Pages
-│   ├── index.tsx        # Landing page
-│   ├── _app.tsx         # Auth layout
+├── routes/              # Pages (file-based routing)
+│   ├── index.tsx        # Landing page (public)
+│   ├── _app.tsx         # Auth guard layout
 │   └── _app/            # Protected pages
 ├── components/
-│   ├── ui/              # Base components
-│   ├── features/        # Feature components
-│   └── layouts/         # Layouts
+│   ├── ui/              # shadcn/ui components
+│   ├── features/        # Feature-specific components
+│   └── layouts/         # Page layouts
+├── integrations/
+│   ├── convex/          # Convex provider
+│   └── workos/          # WorkOS provider
 └── hooks/               # Custom hooks
 
 convex/
 ├── schema.ts            # Database schema
+├── auth.config.ts       # WorkOS JWT validation config
 └── *.ts                 # Queries & mutations
 ```
+
+---
+
+## Authentication Flow
+
+1. User clicks sign in → redirected to WorkOS hosted UI
+2. After login, WorkOS redirects to `/callback` with auth code
+3. `AuthKitProvider` handles the callback and stores session
+4. `ConvexProviderWithAuth` passes the JWT to Convex backend
+5. Convex validates the JWT using the config in `auth.config.ts`
+6. `useConvexAuth()` returns `isAuthenticated: true`
+
+**Important:** Always use `useConvexAuth()` from `convex/react` to check auth state, not WorkOS's `useAuth()`. This ensures the Convex backend has validated the token.
 
 ---
 
@@ -122,18 +216,42 @@ convex/
 
 | Command | Description |
 |---------|-------------|
-| `bun dev` | Start dev server |
+| `bun dev` | Start dev server + Convex |
 | `bun build` | Production build |
-| `bun run lint` | Lint code |
-| `bun run typecheck` | Type check |
-| `bunx convex dev` | Start Convex |
+| `bun run lint` | Lint with Biome |
+| `bun run typecheck` | TypeScript check |
+| `bunx convex dev` | Start Convex dev server |
+| `bunx convex deploy` | Deploy Convex to production |
 
 ---
 
-## Add Components
+## Adding Components
 
 ```bash
 bunx shadcn@latest add [component]
+```
+
+Browse available components at [ui.shadcn.com](https://ui.shadcn.com/docs/components).
+
+---
+
+## Troubleshooting
+
+### Auth not working after login
+
+1. Verify `WORKOS_CLIENT_ID` is set in Convex Dashboard environment variables
+2. Run `bunx convex dev` to sync auth config
+3. Check CORS is configured for your domain in WorkOS Dashboard
+
+### "Missing VITE_CONVEX_URL" error
+
+Run `bunx convex dev` to generate the `.env.local` file.
+
+### "Missing VITE_WORKOS_CLIENT_ID" error
+
+Add your WorkOS Client ID to `.env.local`:
+```bash
+VITE_WORKOS_CLIENT_ID=client_01XXXXXXXXXXXXXXXXXXXXXX
 ```
 
 ---
