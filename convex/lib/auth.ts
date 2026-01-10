@@ -3,7 +3,7 @@ import type { Doc, Id } from "../_generated/dataModel";
 import type { MutationCtx, QueryCtx } from "../_generated/server";
 
 // ============================================
-// AUTH ERROR CODES
+// ERROR CODES
 // ============================================
 
 export const AuthError = {
@@ -12,10 +12,8 @@ export const AuthError = {
 	FORBIDDEN: "FORBIDDEN",
 } as const;
 
-export type AuthErrorCode = (typeof AuthError)[keyof typeof AuthError];
-
 // ============================================
-// AUTH RESULT TYPES
+// TYPES
 // ============================================
 
 export type AuthenticatedUser = Doc<"users">;
@@ -27,41 +25,31 @@ type AuthContext = QueryCtx | MutationCtx;
 // ============================================
 
 /**
- * Get the current authenticated user from context.
+ * Get the current authenticated user.
  * Returns null if not authenticated or user not found.
  *
  * @example
  * const user = await getAuthUser(ctx);
- * if (!user) return null; // Handle unauthenticated
+ * if (!user) return []; // Handle unauthenticated
  */
 export async function getAuthUser(
 	ctx: AuthContext,
 ): Promise<AuthenticatedUser | null> {
 	const identity = await ctx.auth.getUserIdentity();
-	if (!identity) {
-		return null;
-	}
+	if (!identity) return null;
 
-	const user = await ctx.db
+	return ctx.db
 		.query("users")
 		.withIndex("by_workosUserId", (q) => q.eq("workosUserId", identity.subject))
 		.unique();
-
-	return user;
 }
 
 /**
  * Require authentication - throws if not authenticated.
- * Use this for protected queries/mutations.
  *
  * @example
- * export const myQuery = query({
- *   args: {},
- *   handler: async (ctx) => {
- *     const user = await requireAuth(ctx);
- *     // user is guaranteed to exist here
- *   },
- * });
+ * const user = await requireAuth(ctx);
+ * // user is guaranteed to exist
  */
 export async function requireAuth(
 	ctx: AuthContext,
@@ -84,19 +72,10 @@ export async function requireAuth(
 }
 
 /**
- * Require ownership of a resource.
- * Verifies the authenticated user owns the resource.
+ * Require ownership of a resource - throws FORBIDDEN if not owner.
  *
  * @example
- * export const deleteTodo = mutation({
- *   args: { todoId: v.id("todos") },
- *   handler: async (ctx, args) => {
- *     const user = await requireAuth(ctx);
- *     const todo = await ctx.db.get(args.todoId);
- *     requireOwnership(user, todo?.userId);
- *     await ctx.db.delete(args.todoId);
- *   },
- * });
+ * requireOwnership(user, todo.userId);
  */
 export function requireOwnership(
 	user: AuthenticatedUser,
@@ -109,12 +88,6 @@ export function requireOwnership(
 
 /**
  * Check if user has a specific role.
- *
- * @example
- * const user = await requireAuth(ctx);
- * if (!hasRole(user, "admin")) {
- *   throw new ConvexError(AuthError.FORBIDDEN);
- * }
  */
 export function hasRole(
 	user: AuthenticatedUser,
@@ -124,12 +97,7 @@ export function hasRole(
 }
 
 /**
- * Require a specific role - throws FORBIDDEN if user doesn't have the role.
- *
- * @example
- * const user = await requireAuth(ctx);
- * requireRole(user, "admin");
- * // Only admins can reach here
+ * Require a specific role - throws FORBIDDEN if not matching.
  */
 export function requireRole(
 	user: AuthenticatedUser,
@@ -138,15 +106,4 @@ export function requireRole(
 	if (!hasRole(user, role)) {
 		throw new ConvexError(AuthError.FORBIDDEN);
 	}
-}
-
-/**
- * Require admin role - convenience wrapper.
- *
- * @example
- * const user = await requireAuth(ctx);
- * requireAdmin(user);
- */
-export function requireAdmin(user: AuthenticatedUser): void {
-	requireRole(user, "admin");
 }

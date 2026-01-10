@@ -7,6 +7,7 @@ import {
 	Scripts,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
+import { NuqsAdapter } from "nuqs/adapters/tanstack-router";
 import { Toaster } from "sonner";
 import { ThemeProvider } from "../components/providers/ThemeProvider";
 import ConvexProvider from "../integrations/convex/provider";
@@ -82,7 +83,9 @@ export const Route = createRootRoute({
 function RootComponent() {
 	return (
 		<RootDocument>
-			<Outlet />
+			<NuqsAdapter>
+				<Outlet />
+			</NuqsAdapter>
 		</RootDocument>
 	);
 }

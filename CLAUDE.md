@@ -1,6 +1,6 @@
 # Project Zap
 
-> **Stack**: TanStack Start + Convex + WorkOS + shadcn/ui
+> **Stack**: TanStack Start + Convex + WorkOS + shadcn/ui + nuqs
 > **Package Manager**: bun (NOT npm/yarn/pnpm)
 
 ## Commands
@@ -298,3 +298,103 @@ import { useAuth } from "@workos-inc/authkit-react";
 - [ ] Components in `src/components/features/<domain>/`
 - [ ] Route in `src/routes/_app/<feature>.tsx`
 - [ ] Handle loading, empty, error states
+
+---
+
+# nuqs (URL State)
+
+## Basic Usage
+```tsx
+import { useQueryState, parseAsInteger } from "nuqs";
+
+function SearchPage() {
+  const [search, setSearch] = useQueryState("q", parseAsString.withDefault(""));
+  const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
+
+  return (
+    <Input value={search} onChange={(e) => setSearch(e.target.value)} />
+  );
+}
+```
+
+## Multiple Params
+```tsx
+import { useQueryStates } from "nuqs";
+import { searchPaginationParams } from "@/hooks";
+
+function UsersPage() {
+  const [state, setState] = useQueryStates(searchPaginationParams);
+
+  // state.q, state.page, state.pageSize
+  setState({ q: "john", page: 1 });
+}
+```
+
+## Convenience Hooks
+```tsx
+// Single search param
+const [search, setSearch] = useSearchParam();
+
+// Pagination with URL state
+const { page, pageSize, setPage, setPageSize } = usePaginationParams();
+
+// Combined search + pagination
+const { search, page, setSearch, setPage } = useSearchPagination();
+
+// Table state (search, pagination, sorting)
+const tableState = useTableParams();
+
+// Dialog open state in URL (for shareable links)
+const [isOpen, setIsOpen] = useDialogParam("editUser");
+
+// Tab state in URL
+const [tab, setTab] = useTabParam("view", ["list", "grid", "table"]);
+```
+
+---
+
+# Enhanced Hooks
+
+## useEnhancedMutation
+```tsx
+import { useEnhancedMutation } from "@/hooks";
+
+function AddTodoForm() {
+  const { mutate, isLoading, error } = useEnhancedMutation(api.todos.add, {
+    successMessage: "Todo added!",
+    onSuccess: () => setInput(""),
+    // errorMessage: "Custom error",  // Optional override
+    // disableErrorToast: true,       // Disable auto toast
+  });
+
+  const handleSubmit = async () => {
+    await mutate({ text: input });
+  };
+}
+```
+
+## useEnhancedQuery
+```tsx
+import { useEnhancedQuery } from "@/hooks";
+
+function TodoList() {
+  const { data, isLoading, isError } = useEnhancedQuery(api.todos.listMine, {});
+
+  if (isLoading) return <Skeleton />;
+  if (isError) return <ErrorState />;
+  return <List items={data} />;
+}
+```
+
+---
+
+# Lib Files Reference
+
+| File | Purpose |
+|------|---------|
+| `convex/lib/auth.ts` | Auth helpers (requireAuth, requireOwnership) |
+| `convex/lib/validation.ts` | Input validation helpers |
+| `convex/lib/constants.ts` | Backend constants |
+| `src/hooks/use-convex.ts` | Enhanced mutation/query hooks |
+| `src/hooks/use-url-state.ts` | nuqs URL state hooks |
+| `src/lib/constants.ts` | Frontend constants |

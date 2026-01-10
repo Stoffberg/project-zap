@@ -7,7 +7,7 @@ import {
 } from "./constants";
 
 // ============================================
-// VALIDATION ERROR CODES
+// ERROR CODES
 // ============================================
 
 export const ValidationError = {
@@ -71,15 +71,10 @@ export function validateUserName(name: string): string {
 }
 
 /**
- * Validate email format.
- * Returns true if valid, false otherwise.
+ * Check if email format is valid.
  */
 export function isValidEmail(email: string): boolean {
-	if (email.length > EMAIL_MAX_LENGTH) {
-		return false;
-	}
-
-	// Basic email regex - not exhaustive but catches most issues
+	if (email.length > EMAIL_MAX_LENGTH) return false;
 	const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 	return emailRegex.test(email);
 }

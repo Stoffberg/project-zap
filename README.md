@@ -10,6 +10,18 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/Stoffberg/project-zap/actions/workflows/ci.yml">
+    <img src="https://github.com/Stoffberg/project-zap/actions/workflows/ci.yml/badge.svg" alt="CI">
+  </a>
+  <a href="https://vercel.com/stoffberg/project-zap">
+    <img src="https://vercelbadge.vercel.app/api/Stoffberg/project-zap" alt="Vercel">
+  </a>
+  <a href="https://github.com/Stoffberg/project-zap/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/Stoffberg/project-zap" alt="License">
+  </a>
+</p>
+
+<p align="center">
   <a href="#quick-start">Quick Start</a> •
   <a href="#deploy-to-vercel">Deploy</a> •
   <a href="#whats-included">What's Included</a> •
