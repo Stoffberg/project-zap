@@ -10,6 +10,9 @@
 
 import type * as demoGrid from "../demoGrid.js";
 import type * as demoUsers from "../demoUsers.js";
+import type * as lib_auth from "../lib/auth.js";
+import type * as lib_constants from "../lib/constants.js";
+import type * as lib_validation from "../lib/validation.js";
 import type * as preferences from "../preferences.js";
 import type * as todos from "../todos.js";
 import type * as users from "../users.js";
@@ -23,6 +26,9 @@ import type {
 declare const fullApi: ApiFromModules<{
   demoGrid: typeof demoGrid;
   demoUsers: typeof demoUsers;
+  "lib/auth": typeof lib_auth;
+  "lib/constants": typeof lib_constants;
+  "lib/validation": typeof lib_validation;
   preferences: typeof preferences;
   todos: typeof todos;
   users: typeof users;

@@ -1,9 +1,9 @@
-export { Logo, LogoBrand } from "./Logo";
+export { CTA } from "./CTA";
+export { DashboardPreview } from "./DashboardPreview";
+export { Features } from "./Features";
+export { Footer } from "./Footer";
 export { Header } from "./Header";
 export { Hero } from "./Hero";
-export { DashboardPreview } from "./DashboardPreview";
-export { TechStack } from "./TechStack";
-export { Features } from "./Features";
 export { LiveDemo } from "./LiveDemo";
-export { CTA } from "./CTA";
-export { Footer } from "./Footer";
+export { Logo, LogoBrand } from "./Logo";
+export { TechStack } from "./TechStack";

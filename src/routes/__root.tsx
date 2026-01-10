@@ -1,11 +1,16 @@
-import { HeadContent, Link, Outlet, Scripts, createRootRoute } from "@tanstack/react-router";
-import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { TanStackDevtools } from "@tanstack/react-devtools";
+import {
+	createRootRoute,
+	HeadContent,
+	Link,
+	Outlet,
+	Scripts,
+} from "@tanstack/react-router";
+import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { Toaster } from "sonner";
-
-import WorkOSProvider from "../integrations/workos/provider";
-import ConvexProvider from "../integrations/convex/provider";
 import { ThemeProvider } from "../components/providers/ThemeProvider";
+import ConvexProvider from "../integrations/convex/provider";
+import WorkOSProvider from "../integrations/workos/provider";
 
 import appCss from "../styles.css?url";
 
@@ -31,103 +36,103 @@ const themeScript = `
 `;
 
 export const Route = createRootRoute({
-  head: () => ({
-    meta: [
-      {
-        charSet: "utf-8",
-      },
-      {
-        name: "viewport",
-        content: "width=device-width, initial-scale=1",
-      },
-      {
-        title: "Project Zap",
-      },
-    ],
-    links: [
-      {
-        rel: "stylesheet",
-        href: appCss,
-      },
-      {
-        rel: "icon",
-        type: "image/svg+xml",
-        href: "/favicon.svg",
-      },
-      {
-        rel: "icon",
-        type: "image/x-icon",
-        href: "/favicon.ico",
-      },
-      {
-        rel: "apple-touch-icon",
-        href: "/logo192.png",
-      },
-      {
-        rel: "manifest",
-        href: "/manifest.json",
-      },
-    ],
-  }),
+	head: () => ({
+		meta: [
+			{
+				charSet: "utf-8",
+			},
+			{
+				name: "viewport",
+				content: "width=device-width, initial-scale=1",
+			},
+			{
+				title: "Project Zap",
+			},
+		],
+		links: [
+			{
+				rel: "stylesheet",
+				href: appCss,
+			},
+			{
+				rel: "icon",
+				type: "image/svg+xml",
+				href: "/favicon.svg",
+			},
+			{
+				rel: "icon",
+				type: "image/x-icon",
+				href: "/favicon.ico",
+			},
+			{
+				rel: "apple-touch-icon",
+				href: "/logo192.png",
+			},
+			{
+				rel: "manifest",
+				href: "/manifest.json",
+			},
+		],
+	}),
 
-  component: RootComponent,
-  notFoundComponent: NotFoundPage,
+	component: RootComponent,
+	notFoundComponent: NotFoundPage,
 });
 
 function RootComponent() {
-  return (
-    <RootDocument>
-      <Outlet />
-    </RootDocument>
-  );
+	return (
+		<RootDocument>
+			<Outlet />
+		</RootDocument>
+	);
 }
 
 function NotFoundPage() {
-  return (
-    <RootDocument>
-      <div className="flex min-h-screen flex-col items-center justify-center bg-background">
-        <h1 className="mb-4 text-6xl font-bold">404</h1>
-        <p className="mb-8 text-xl text-muted-foreground">Page not found</p>
-        <Link
-          to="/"
-          className="rounded-md bg-primary px-4 py-2 text-primary-foreground transition-colors hover:bg-primary/90"
-        >
-          Go home
-        </Link>
-      </div>
-    </RootDocument>
-  );
+	return (
+		<RootDocument>
+			<div className="flex min-h-screen flex-col items-center justify-center bg-background">
+				<h1 className="mb-4 text-6xl font-bold">404</h1>
+				<p className="mb-8 text-xl text-muted-foreground">Page not found</p>
+				<Link
+					to="/"
+					className="rounded-md bg-primary px-4 py-2 text-primary-foreground transition-colors hover:bg-primary/90"
+				>
+					Go home
+				</Link>
+			</div>
+		</RootDocument>
+	);
 }
 
 function RootDocument({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="en" suppressHydrationWarning>
-      <head>
-        <HeadContent />
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
-      </head>
-      <body className="h-screen overflow-hidden bg-background text-foreground antialiased">
-        <ThemeProvider>
-          <WorkOSProvider>
-            <ConvexProvider>
-              {children}
-              <Toaster position="bottom-right" richColors />
-              <TanStackDevtools
-                config={{
-                  position: "bottom-right",
-                }}
-                plugins={[
-                  {
-                    name: "Tanstack Router",
-                    render: <TanStackRouterDevtoolsPanel />,
-                  },
-                ]}
-              />
-            </ConvexProvider>
-          </WorkOSProvider>
-        </ThemeProvider>
-        <Scripts />
-      </body>
-    </html>
-  );
+	return (
+		<html lang="en" suppressHydrationWarning>
+			<head>
+				<HeadContent />
+				<script dangerouslySetInnerHTML={{ __html: themeScript }} />
+			</head>
+			<body className="h-screen overflow-hidden bg-background text-foreground antialiased">
+				<ThemeProvider>
+					<WorkOSProvider>
+						<ConvexProvider>
+							{children}
+							<Toaster position="bottom-right" richColors />
+							<TanStackDevtools
+								config={{
+									position: "bottom-right",
+								}}
+								plugins={[
+									{
+										name: "Tanstack Router",
+										render: <TanStackRouterDevtoolsPanel />,
+									},
+								]}
+							/>
+						</ConvexProvider>
+					</WorkOSProvider>
+				</ThemeProvider>
+				<Scripts />
+			</body>
+		</html>
+	);
 }

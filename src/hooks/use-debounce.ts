@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 /**
  * Debounces a value by the specified delay.
@@ -14,19 +14,19 @@ import { useEffect, useState, useRef, useCallback } from "react";
  * }, [debouncedSearch]);
  */
 export function useDebounce<T>(value: T, delay: number): T {
-  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+	const [debouncedValue, setDebouncedValue] = useState<T>(value);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			setDebouncedValue(value);
+		}, delay);
 
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [value, delay]);
+		return () => {
+			clearTimeout(timer);
+		};
+	}, [value, delay]);
 
-  return debouncedValue;
+	return debouncedValue;
 }
 
 /**
@@ -43,38 +43,38 @@ export function useDebounce<T>(value: T, delay: number): T {
  * <input onChange={(e) => debouncedSave(e.target.value)} />
  */
 export function useDebouncedCallback<T extends (...args: unknown[]) => unknown>(
-  callback: T,
-  delay: number
+	callback: T,
+	delay: number,
 ): (...args: Parameters<T>) => void {
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const callbackRef = useRef(callback);
+	const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+	const callbackRef = useRef(callback);
 
-  // Keep callback ref updated
-  useEffect(() => {
-    callbackRef.current = callback;
-  }, [callback]);
+	// Keep callback ref updated
+	useEffect(() => {
+		callbackRef.current = callback;
+	}, [callback]);
 
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
-  }, []);
+	// Cleanup on unmount
+	useEffect(() => {
+		return () => {
+			if (timeoutRef.current) {
+				clearTimeout(timeoutRef.current);
+			}
+		};
+	}, []);
 
-  return useCallback(
-    (...args: Parameters<T>) => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
+	return useCallback(
+		(...args: Parameters<T>) => {
+			if (timeoutRef.current) {
+				clearTimeout(timeoutRef.current);
+			}
 
-      timeoutRef.current = setTimeout(() => {
-        callbackRef.current(...args);
-      }, delay);
-    },
-    [delay]
-  );
+			timeoutRef.current = setTimeout(() => {
+				callbackRef.current(...args);
+			}, delay);
+		},
+		[delay],
+	);
 }
 
 /**
@@ -93,44 +93,44 @@ export function useDebouncedCallback<T extends (...args: unknown[]) => unknown>(
  * }, [throttledScroll]);
  */
 export function useThrottledCallback<T extends (...args: unknown[]) => unknown>(
-  callback: T,
-  interval: number
+	callback: T,
+	interval: number,
 ): (...args: Parameters<T>) => void {
-  const lastRunRef = useRef<number>(0);
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const callbackRef = useRef(callback);
+	const lastRunRef = useRef<number>(0);
+	const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+	const callbackRef = useRef(callback);
 
-  useEffect(() => {
-    callbackRef.current = callback;
-  }, [callback]);
+	useEffect(() => {
+		callbackRef.current = callback;
+	}, [callback]);
 
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
-  }, []);
+	useEffect(() => {
+		return () => {
+			if (timeoutRef.current) {
+				clearTimeout(timeoutRef.current);
+			}
+		};
+	}, []);
 
-  return useCallback(
-    (...args: Parameters<T>) => {
-      const now = Date.now();
-      const timeSinceLastRun = now - lastRunRef.current;
+	return useCallback(
+		(...args: Parameters<T>) => {
+			const now = Date.now();
+			const timeSinceLastRun = now - lastRunRef.current;
 
-      if (timeSinceLastRun >= interval) {
-        lastRunRef.current = now;
-        callbackRef.current(...args);
-      } else {
-        // Schedule for the remaining time
-        if (timeoutRef.current) {
-          clearTimeout(timeoutRef.current);
-        }
-        timeoutRef.current = setTimeout(() => {
-          lastRunRef.current = Date.now();
-          callbackRef.current(...args);
-        }, interval - timeSinceLastRun);
-      }
-    },
-    [interval]
-  );
+			if (timeSinceLastRun >= interval) {
+				lastRunRef.current = now;
+				callbackRef.current(...args);
+			} else {
+				// Schedule for the remaining time
+				if (timeoutRef.current) {
+					clearTimeout(timeoutRef.current);
+				}
+				timeoutRef.current = setTimeout(() => {
+					lastRunRef.current = Date.now();
+					callbackRef.current(...args);
+				}, interval - timeSinceLastRun);
+			}
+		},
+		[interval],
+	);
 }

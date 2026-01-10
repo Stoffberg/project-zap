@@ -1,0 +1,102 @@
+import { ConvexError } from "convex/values";
+import {
+	EMAIL_MAX_LENGTH,
+	TODO_TEXT_MAX_LENGTH,
+	USER_NAME_MAX_LENGTH,
+	USER_NAME_MIN_LENGTH,
+} from "./constants";
+
+// ============================================
+// VALIDATION ERROR CODES
+// ============================================
+
+export const ValidationError = {
+	INVALID_INPUT: "INVALID_INPUT",
+	TEXT_TOO_LONG: "TEXT_TOO_LONG",
+	TEXT_TOO_SHORT: "TEXT_TOO_SHORT",
+	TEXT_REQUIRED: "TEXT_REQUIRED",
+	INVALID_EMAIL: "INVALID_EMAIL",
+} as const;
+
+// ============================================
+// VALIDATION HELPERS
+// ============================================
+
+/**
+ * Validate and sanitize todo text.
+ * Throws ConvexError if validation fails.
+ */
+export function validateTodoText(text: string): string {
+	const trimmed = text.trim();
+
+	if (trimmed.length === 0) {
+		throw new ConvexError({
+			code: ValidationError.TEXT_REQUIRED,
+			message: "Todo text is required",
+		});
+	}
+
+	if (trimmed.length > TODO_TEXT_MAX_LENGTH) {
+		throw new ConvexError({
+			code: ValidationError.TEXT_TOO_LONG,
+			message: `Todo text must be ${TODO_TEXT_MAX_LENGTH} characters or less`,
+		});
+	}
+
+	return trimmed;
+}
+
+/**
+ * Validate and sanitize user name.
+ * Throws ConvexError if validation fails.
+ */
+export function validateUserName(name: string): string {
+	const trimmed = name.trim();
+
+	if (trimmed.length < USER_NAME_MIN_LENGTH) {
+		throw new ConvexError({
+			code: ValidationError.TEXT_TOO_SHORT,
+			message: `Name must be at least ${USER_NAME_MIN_LENGTH} character`,
+		});
+	}
+
+	if (trimmed.length > USER_NAME_MAX_LENGTH) {
+		throw new ConvexError({
+			code: ValidationError.TEXT_TOO_LONG,
+			message: `Name must be ${USER_NAME_MAX_LENGTH} characters or less`,
+		});
+	}
+
+	return trimmed;
+}
+
+/**
+ * Validate email format.
+ * Returns true if valid, false otherwise.
+ */
+export function isValidEmail(email: string): boolean {
+	if (email.length > EMAIL_MAX_LENGTH) {
+		return false;
+	}
+
+	// Basic email regex - not exhaustive but catches most issues
+	const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+	return emailRegex.test(email);
+}
+
+/**
+ * Validate and sanitize email.
+ * Throws ConvexError if validation fails.
+ */
+export function validateEmail(email: string): string {
+	const trimmed = email.trim().toLowerCase();
+
+	if (!isValidEmail(trimmed)) {
+		throw new ConvexError({
+			code: ValidationError.INVALID_EMAIL,
+			message: "Invalid email address",
+		});
+	}
+
+	return trimmed;
+}

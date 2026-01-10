@@ -1,21 +1,21 @@
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
 
 export interface UseDialogReturn<T = undefined> {
-  /** Whether the dialog is open */
-  isOpen: boolean;
-  /** Data passed when opening the dialog */
-  data: T | undefined;
-  /** Open the dialog, optionally with data */
-  open: (data?: T) => void;
-  /** Close the dialog */
-  close: () => void;
-  /** Toggle the dialog */
-  toggle: () => void;
-  /** Props to spread on Dialog component */
-  dialogProps: {
-    open: boolean;
-    onOpenChange: (open: boolean) => void;
-  };
+	/** Whether the dialog is open */
+	isOpen: boolean;
+	/** Data passed when opening the dialog */
+	data: T | undefined;
+	/** Open the dialog, optionally with data */
+	open: (data?: T) => void;
+	/** Close the dialog */
+	close: () => void;
+	/** Toggle the dialog */
+	toggle: () => void;
+	/** Props to spread on Dialog component */
+	dialogProps: {
+		open: boolean;
+		onOpenChange: (open: boolean) => void;
+	};
 }
 
 /**
@@ -42,46 +42,46 @@ export interface UseDialogReturn<T = undefined> {
  * </Dialog>
  */
 export function useDialog<T = undefined>(): UseDialogReturn<T> {
-  const [isOpen, setIsOpen] = useState(false);
-  const [data, setData] = useState<T | undefined>(undefined);
+	const [isOpen, setIsOpen] = useState(false);
+	const [data, setData] = useState<T | undefined>(undefined);
 
-  const open = useCallback((openData?: T) => {
-    setData(openData);
-    setIsOpen(true);
-  }, []);
+	const open = useCallback((openData?: T) => {
+		setData(openData);
+		setIsOpen(true);
+	}, []);
 
-  const close = useCallback(() => {
-    setIsOpen(false);
-    // Clear data after animation completes
-    setTimeout(() => setData(undefined), 150);
-  }, []);
+	const close = useCallback(() => {
+		setIsOpen(false);
+		// Clear data after animation completes
+		setTimeout(() => setData(undefined), 150);
+	}, []);
 
-  const toggle = useCallback(() => {
-    setIsOpen((prev) => !prev);
-  }, []);
+	const toggle = useCallback(() => {
+		setIsOpen((prev) => !prev);
+	}, []);
 
-  const onOpenChange = useCallback(
-    (open: boolean) => {
-      if (open) {
-        setIsOpen(true);
-      } else {
-        close();
-      }
-    },
-    [close]
-  );
+	const onOpenChange = useCallback(
+		(open: boolean) => {
+			if (open) {
+				setIsOpen(true);
+			} else {
+				close();
+			}
+		},
+		[close],
+	);
 
-  return {
-    isOpen,
-    data,
-    open,
-    close,
-    toggle,
-    dialogProps: {
-      open: isOpen,
-      onOpenChange,
-    },
-  };
+	return {
+		isOpen,
+		data,
+		open,
+		close,
+		toggle,
+		dialogProps: {
+			open: isOpen,
+			onOpenChange,
+		},
+	};
 }
 
 /**
@@ -103,73 +103,76 @@ export function useDialog<T = undefined>(): UseDialogReturn<T> {
  * };
  */
 export interface ConfirmDialogOptions {
-  title: string;
-  description?: string;
-  confirmText?: string;
-  cancelText?: string;
-  variant?: "default" | "destructive";
+	title: string;
+	description?: string;
+	confirmText?: string;
+	cancelText?: string;
+	variant?: "default" | "destructive";
 }
 
 export interface UseConfirmDialogReturn {
-  isOpen: boolean;
-  options: ConfirmDialogOptions | null;
-  confirm: (options: ConfirmDialogOptions) => Promise<boolean>;
-  handleConfirm: () => void;
-  handleCancel: () => void;
-  dialogProps: {
-    open: boolean;
-    onOpenChange: (open: boolean) => void;
-  };
+	isOpen: boolean;
+	options: ConfirmDialogOptions | null;
+	confirm: (options: ConfirmDialogOptions) => Promise<boolean>;
+	handleConfirm: () => void;
+	handleCancel: () => void;
+	dialogProps: {
+		open: boolean;
+		onOpenChange: (open: boolean) => void;
+	};
 }
 
 export function useConfirmDialog(): UseConfirmDialogReturn {
-  const [isOpen, setIsOpen] = useState(false);
-  const [options, setOptions] = useState<ConfirmDialogOptions | null>(null);
-  const [resolveRef, setResolveRef] = useState<
-    ((value: boolean) => void) | null
-  >(null);
+	const [isOpen, setIsOpen] = useState(false);
+	const [options, setOptions] = useState<ConfirmDialogOptions | null>(null);
+	const [resolveRef, setResolveRef] = useState<
+		((value: boolean) => void) | null
+	>(null);
 
-  const confirm = useCallback((opts: ConfirmDialogOptions): Promise<boolean> => {
-    setOptions(opts);
-    setIsOpen(true);
+	const confirm = useCallback(
+		(opts: ConfirmDialogOptions): Promise<boolean> => {
+			setOptions(opts);
+			setIsOpen(true);
 
-    return new Promise((resolve) => {
-      setResolveRef(() => resolve);
-    });
-  }, []);
+			return new Promise((resolve) => {
+				setResolveRef(() => resolve);
+			});
+		},
+		[],
+	);
 
-  const handleConfirm = useCallback(() => {
-    setIsOpen(false);
-    resolveRef?.(true);
-    setResolveRef(null);
-    setTimeout(() => setOptions(null), 150);
-  }, [resolveRef]);
+	const handleConfirm = useCallback(() => {
+		setIsOpen(false);
+		resolveRef?.(true);
+		setResolveRef(null);
+		setTimeout(() => setOptions(null), 150);
+	}, [resolveRef]);
 
-  const handleCancel = useCallback(() => {
-    setIsOpen(false);
-    resolveRef?.(false);
-    setResolveRef(null);
-    setTimeout(() => setOptions(null), 150);
-  }, [resolveRef]);
+	const handleCancel = useCallback(() => {
+		setIsOpen(false);
+		resolveRef?.(false);
+		setResolveRef(null);
+		setTimeout(() => setOptions(null), 150);
+	}, [resolveRef]);
 
-  const onOpenChange = useCallback(
-    (open: boolean) => {
-      if (!open) {
-        handleCancel();
-      }
-    },
-    [handleCancel]
-  );
+	const onOpenChange = useCallback(
+		(open: boolean) => {
+			if (!open) {
+				handleCancel();
+			}
+		},
+		[handleCancel],
+	);
 
-  return {
-    isOpen,
-    options,
-    confirm,
-    handleConfirm,
-    handleCancel,
-    dialogProps: {
-      open: isOpen,
-      onOpenChange,
-    },
-  };
+	return {
+		isOpen,
+		options,
+		confirm,
+		handleConfirm,
+		handleCancel,
+		dialogProps: {
+			open: isOpen,
+			onOpenChange,
+		},
+	};
 }

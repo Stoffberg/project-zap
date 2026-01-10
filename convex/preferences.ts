@@ -1,6 +1,6 @@
-import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
-import { ConvexError } from "convex/values";
+import { mutation, query } from "./_generated/server";
+import { getAuthUser, requireAuth } from "./lib/auth";
 import { themeValidator } from "./schema";
 
 // ============================================
@@ -8,22 +8,22 @@ import { themeValidator } from "./schema";
 // ============================================
 
 const preferencesReturnValidator = v.object({
-  _id: v.id("userPreferences"),
-  _creationTime: v.number(),
-  userId: v.id("users"),
+	_id: v.id("userPreferences"),
+	_creationTime: v.number(),
+	userId: v.id("users"),
 
-  // Appearance
-  theme: v.optional(themeValidator),
-  reducedMotion: v.optional(v.boolean()),
-  compactMode: v.optional(v.boolean()),
+	// Appearance
+	theme: v.optional(themeValidator),
+	reducedMotion: v.optional(v.boolean()),
+	compactMode: v.optional(v.boolean()),
 
-  // Notifications
-  emailNotifications: v.optional(v.boolean()),
-  pushNotifications: v.optional(v.boolean()),
-  todoReminders: v.optional(v.boolean()),
-  weeklyDigest: v.optional(v.boolean()),
-  mentions: v.optional(v.boolean()),
-  marketingEmails: v.optional(v.boolean()),
+	// Notifications
+	emailNotifications: v.optional(v.boolean()),
+	pushNotifications: v.optional(v.boolean()),
+	todoReminders: v.optional(v.boolean()),
+	weeklyDigest: v.optional(v.boolean()),
+	mentions: v.optional(v.boolean()),
+	marketingEmails: v.optional(v.boolean()),
 });
 
 // ============================================
@@ -35,18 +35,18 @@ const preferencesReturnValidator = v.object({
  * Used when preferences haven't been explicitly set
  */
 export const DEFAULT_PREFERENCES = {
-  // Appearance
-  theme: "system" as const,
-  reducedMotion: false,
-  compactMode: false,
+	// Appearance
+	theme: "system" as const,
+	reducedMotion: false,
+	compactMode: false,
 
-  // Notifications
-  emailNotifications: true,
-  pushNotifications: false,
-  todoReminders: true,
-  weeklyDigest: true,
-  mentions: true,
-  marketingEmails: false,
+	// Notifications
+	emailNotifications: true,
+	pushNotifications: false,
+	todoReminders: true,
+	weeklyDigest: true,
+	mentions: true,
+	marketingEmails: false,
 };
 
 // ============================================
@@ -58,42 +58,44 @@ export const DEFAULT_PREFERENCES = {
  * Returns null if not authenticated or no preferences exist
  */
 export const getMine = query({
-  args: {},
-  returns: v.union(preferencesReturnValidator, v.null()),
-  handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-      return null;
-    }
+	args: {},
+	returns: v.union(preferencesReturnValidator, v.null()),
+	handler: async (ctx) => {
+		const user = await getAuthUser(ctx);
+		if (!user) {
+			return null;
+		}
 
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_workosUserId", (q) => q.eq("workosUserId", identity.subject))
-      .unique();
-
-    if (!user) {
-      return null;
-    }
-
-    return await ctx.db
-      .query("userPreferences")
-      .withIndex("by_userId", (q) => q.eq("userId", user._id))
-      .unique();
-  },
+		return await ctx.db
+			.query("userPreferences")
+			.withIndex("by_userId", (q) => q.eq("userId", user._id))
+			.unique();
+	},
 });
 
 /**
  * Get preferences for a specific user
+ * Requires authentication and ownership (or admin role)
  */
 export const getByUser = query({
-  args: { userId: v.id("users") },
-  returns: v.union(preferencesReturnValidator, v.null()),
-  handler: async (ctx, args) => {
-    return await ctx.db
-      .query("userPreferences")
-      .withIndex("by_userId", (q) => q.eq("userId", args.userId))
-      .unique();
-  },
+	args: { userId: v.id("users") },
+	returns: v.union(preferencesReturnValidator, v.null()),
+	handler: async (ctx, args) => {
+		const user = await getAuthUser(ctx);
+		if (!user) {
+			return null;
+		}
+
+		// Only allow users to view their own preferences (or admins)
+		if (user._id !== args.userId && user.role !== "admin") {
+			return null;
+		}
+
+		return await ctx.db
+			.query("userPreferences")
+			.withIndex("by_userId", (q) => q.eq("userId", args.userId))
+			.unique();
+	},
 });
 
 // ============================================
@@ -105,49 +107,37 @@ export const getByUser = query({
  * Creates preferences record if it doesn't exist
  */
 export const updateAppearance = mutation({
-  args: {
-    theme: v.optional(themeValidator),
-    reducedMotion: v.optional(v.boolean()),
-    compactMode: v.optional(v.boolean()),
-  },
-  returns: v.null(),
-  handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-      throw new ConvexError("UNAUTHENTICATED");
-    }
+	args: {
+		theme: v.optional(themeValidator),
+		reducedMotion: v.optional(v.boolean()),
+		compactMode: v.optional(v.boolean()),
+	},
+	returns: v.null(),
+	handler: async (ctx, args) => {
+		const user = await requireAuth(ctx);
 
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_workosUserId", (q) => q.eq("workosUserId", identity.subject))
-      .unique();
+		const existing = await ctx.db
+			.query("userPreferences")
+			.withIndex("by_userId", (q) => q.eq("userId", user._id))
+			.unique();
 
-    if (!user) {
-      throw new ConvexError("USER_NOT_FOUND");
-    }
+		if (existing) {
+			await ctx.db.patch(existing._id, {
+				theme: args.theme,
+				reducedMotion: args.reducedMotion,
+				compactMode: args.compactMode,
+			});
+		} else {
+			await ctx.db.insert("userPreferences", {
+				userId: user._id,
+				theme: args.theme,
+				reducedMotion: args.reducedMotion,
+				compactMode: args.compactMode,
+			});
+		}
 
-    const existing = await ctx.db
-      .query("userPreferences")
-      .withIndex("by_userId", (q) => q.eq("userId", user._id))
-      .unique();
-
-    if (existing) {
-      await ctx.db.patch(existing._id, {
-        theme: args.theme,
-        reducedMotion: args.reducedMotion,
-        compactMode: args.compactMode,
-      });
-    } else {
-      await ctx.db.insert("userPreferences", {
-        userId: user._id,
-        theme: args.theme,
-        reducedMotion: args.reducedMotion,
-        compactMode: args.compactMode,
-      });
-    }
-
-    return null;
-  },
+		return null;
+	},
 });
 
 /**
@@ -155,56 +145,44 @@ export const updateAppearance = mutation({
  * Creates preferences record if it doesn't exist
  */
 export const updateNotifications = mutation({
-  args: {
-    emailNotifications: v.optional(v.boolean()),
-    pushNotifications: v.optional(v.boolean()),
-    todoReminders: v.optional(v.boolean()),
-    weeklyDigest: v.optional(v.boolean()),
-    mentions: v.optional(v.boolean()),
-    marketingEmails: v.optional(v.boolean()),
-  },
-  returns: v.null(),
-  handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-      throw new ConvexError("UNAUTHENTICATED");
-    }
+	args: {
+		emailNotifications: v.optional(v.boolean()),
+		pushNotifications: v.optional(v.boolean()),
+		todoReminders: v.optional(v.boolean()),
+		weeklyDigest: v.optional(v.boolean()),
+		mentions: v.optional(v.boolean()),
+		marketingEmails: v.optional(v.boolean()),
+	},
+	returns: v.null(),
+	handler: async (ctx, args) => {
+		const user = await requireAuth(ctx);
 
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_workosUserId", (q) => q.eq("workosUserId", identity.subject))
-      .unique();
+		const existing = await ctx.db
+			.query("userPreferences")
+			.withIndex("by_userId", (q) => q.eq("userId", user._id))
+			.unique();
 
-    if (!user) {
-      throw new ConvexError("USER_NOT_FOUND");
-    }
+		if (existing) {
+			await ctx.db.patch(existing._id, {
+				emailNotifications: args.emailNotifications,
+				pushNotifications: args.pushNotifications,
+				todoReminders: args.todoReminders,
+				weeklyDigest: args.weeklyDigest,
+				mentions: args.mentions,
+				marketingEmails: args.marketingEmails,
+			});
+		} else {
+			await ctx.db.insert("userPreferences", {
+				userId: user._id,
+				emailNotifications: args.emailNotifications,
+				pushNotifications: args.pushNotifications,
+				todoReminders: args.todoReminders,
+				weeklyDigest: args.weeklyDigest,
+				mentions: args.mentions,
+				marketingEmails: args.marketingEmails,
+			});
+		}
 
-    const existing = await ctx.db
-      .query("userPreferences")
-      .withIndex("by_userId", (q) => q.eq("userId", user._id))
-      .unique();
-
-    if (existing) {
-      await ctx.db.patch(existing._id, {
-        emailNotifications: args.emailNotifications,
-        pushNotifications: args.pushNotifications,
-        todoReminders: args.todoReminders,
-        weeklyDigest: args.weeklyDigest,
-        mentions: args.mentions,
-        marketingEmails: args.marketingEmails,
-      });
-    } else {
-      await ctx.db.insert("userPreferences", {
-        userId: user._id,
-        emailNotifications: args.emailNotifications,
-        pushNotifications: args.pushNotifications,
-        todoReminders: args.todoReminders,
-        weeklyDigest: args.weeklyDigest,
-        mentions: args.mentions,
-        marketingEmails: args.marketingEmails,
-      });
-    }
-
-    return null;
-  },
+		return null;
+	},
 });

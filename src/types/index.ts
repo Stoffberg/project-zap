@@ -1,84 +1,56 @@
 /**
  * Shared TypeScript types for the application.
- * These types mirror the Convex schema but are for frontend use.
+ * Re-exports Convex generated types for consistency.
  *
- * IMPORTANT: Keep these in sync with convex/schema.ts
+ * Use Doc<"tableName"> for document types throughout the app.
  */
 
-import type { Id } from "../../convex/_generated/dataModel";
+import type { Doc } from "../../convex/_generated/dataModel";
 
 // ============================================
-// USER TYPES
+// RE-EXPORT CONVEX TYPES
 // ============================================
 
-export type UserRole = "admin" | "member";
+// Re-export for convenience - use these instead of defining manually
+export type { Doc, Id } from "../../convex/_generated/dataModel";
 
-export interface User {
-  _id: Id<"users">;
-  _creationTime: number;
-  email: string;
-  name: string;
-  workosUserId: string;
-  avatarUrl?: string;
-  role: UserRole;
-}
+// Type aliases for common document types
+export type User = Doc<"users">;
+export type Todo = Doc<"todos">;
+export type UserPreferences = Doc<"userPreferences">;
+export type DemoUser = Doc<"demoUsers">;
+export type DemoGridCell = Doc<"demoGrid">;
 
 // ============================================
-// TODO TYPES
+// DERIVED TYPES
 // ============================================
 
-export type TodoPriority = "low" | "medium" | "high";
-
-export interface Todo {
-  _id: Id<"todos">;
-  _creationTime: number;
-  text: string;
-  completed: boolean;
-  userId?: Id<"users">;
-  dueDate?: number;
-  priority?: TodoPriority;
-}
+// Extract field types from documents
+export type UserRole = User["role"];
+export type TodoPriority = NonNullable<Todo["priority"]>;
+export type Theme = NonNullable<UserPreferences["theme"]>;
+export type DemoUserRole = DemoUser["role"];
+export type DemoUserStatus = DemoUser["status"];
 
 // ============================================
-// PREFERENCE TYPES
+// DEFAULT VALUES
 // ============================================
-
-export type Theme = "light" | "dark" | "system";
-
-export interface UserPreferences {
-  _id: Id<"userPreferences">;
-  _creationTime: number;
-  userId: Id<"users">;
-
-  // Appearance
-  theme?: Theme;
-  reducedMotion?: boolean;
-  compactMode?: boolean;
-
-  // Notifications
-  emailNotifications?: boolean;
-  pushNotifications?: boolean;
-  todoReminders?: boolean;
-  weeklyDigest?: boolean;
-  mentions?: boolean;
-  marketingEmails?: boolean;
-}
 
 /**
  * Default values for user preferences.
  * Used when preferences haven't been explicitly set.
  */
-export const DEFAULT_USER_PREFERENCES: Omit<UserPreferences, "_id" | "_creationTime" | "userId"> = {
-  theme: "system",
-  reducedMotion: false,
-  compactMode: false,
-  emailNotifications: true,
-  pushNotifications: false,
-  todoReminders: true,
-  weeklyDigest: true,
-  mentions: true,
-  marketingEmails: false,
-};
+export const DEFAULT_USER_PREFERENCES = {
+	theme: "system" as const,
+	reducedMotion: false,
+	compactMode: false,
+	emailNotifications: true,
+	pushNotifications: false,
+	todoReminders: true,
+	weeklyDigest: true,
+	mentions: true,
+	marketingEmails: false,
+} satisfies Omit<UserPreferences, "_id" | "_creationTime" | "userId">;
 
 // ============================================
 // UTILITY TYPES
@@ -92,4 +64,5 @@ export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 /**
  * Make specific properties required in a type
  */
-export type RequiredBy<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>;
+export type RequiredBy<T, K extends keyof T> = Omit<T, K> &
+	Required<Pick<T, K>>;

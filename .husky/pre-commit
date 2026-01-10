@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# Run lint-staged (biome lint + format on staged files)
+bun run lint-staged
+
+# Run type checking on the entire project
+bun run typecheck

@@ -19,7 +19,7 @@ import { api } from "../../convex/_generated/api";
  * ```
  */
 export function useCurrentUser() {
-  return useQuery(api.users.current);
+	return useQuery(api.users.current);
 }
 
 /**
@@ -30,8 +30,8 @@ export function useCurrentUser() {
  * @returns The authenticated user
  */
 export function useRequireUser() {
-  const user = useCurrentUser();
-  if (user === undefined) throw new Error("Loading user");
-  if (user === null) throw new Error("Not authenticated");
-  return user;
+	const user = useCurrentUser();
+	if (user === undefined) throw new Error("Loading user");
+	if (user === null) throw new Error("Not authenticated");
+	return user;
 }
