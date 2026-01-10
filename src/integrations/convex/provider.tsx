@@ -1,12 +1,9 @@
-import { useAuth } from "@workos-inc/authkit-react";
-import { ConvexProviderWithAuth, ConvexReactClient } from "convex/react";
 import {
-	type ReactNode,
-	useCallback,
-	useEffect,
-	useMemo,
-	useState,
-} from "react";
+	useAccessToken,
+	useAuth,
+} from "@workos/authkit-tanstack-react-start/client";
+import { ConvexProviderWithAuth, ConvexReactClient } from "convex/react";
+import { type ReactNode, useCallback, useMemo } from "react";
 
 const CONVEX_URL = import.meta.env.VITE_CONVEX_URL;
 if (!CONVEX_URL) {
@@ -16,13 +13,15 @@ if (!CONVEX_URL) {
 const convex = new ConvexReactClient(CONVEX_URL);
 
 function useAuthFromWorkOS() {
-	const { isLoading, user, getAccessToken } = useAuth();
+	const { user, loading: isLoading } = useAuth();
+	const { getAccessToken } = useAccessToken();
 
 	const fetchAccessToken = useCallback(
-		async ({ forceRefreshToken }: { forceRefreshToken: boolean }) => {
+		async (_args: { forceRefreshToken: boolean }): Promise<string | null> => {
 			if (!user) return null;
 			try {
-				return await getAccessToken({ forceRefresh: forceRefreshToken });
+				const token = await getAccessToken();
+				return token ?? null;
 			} catch {
 				return null;
 			}
@@ -45,17 +44,6 @@ export default function ConvexClientProvider({
 }: {
 	children: ReactNode;
 }) {
-	const [mounted, setMounted] = useState(false);
-
-	useEffect(() => {
-		setMounted(true);
-	}, []);
-
-	// Don't render Convex provider on server
-	if (!mounted) {
-		return <>{children}</>;
-	}
-
 	return (
 		<ConvexProviderWithAuth client={convex} useAuth={useAuthFromWorkOS}>
 			{children}

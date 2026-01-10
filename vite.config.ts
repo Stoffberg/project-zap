@@ -7,9 +7,6 @@ import { defineConfig } from "vite";
 import viteTsConfigPaths from "vite-tsconfig-paths";
 
 const config = defineConfig({
-	ssr: {
-		noExternal: ["@workos-inc/authkit-react", "@workos-inc/authkit-js"],
-	},
 	plugins: [
 		devtools(),
 		nitro(),
@@ -18,7 +15,11 @@ const config = defineConfig({
 			projects: ["./tsconfig.json"],
 		}),
 		tailwindcss(),
-		tanstackStart(),
+		tanstackStart({
+			start: {
+				entry: "./start",
+			},
+		}),
 		viteReact({
 			babel: {
 				plugins: ["babel-plugin-react-compiler"],

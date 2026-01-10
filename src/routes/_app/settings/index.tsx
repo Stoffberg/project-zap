@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useAuth } from "@workos-inc/authkit-react";
+import { useAuth } from "@workos/authkit-tanstack-react-start/client";
 import { useMutation } from "convex/react";
 import { Calendar, Mail, Save, Shield } from "lucide-react";
 import { useState } from "react";

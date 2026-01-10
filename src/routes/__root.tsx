@@ -7,10 +7,10 @@ import {
 	Scripts,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
+import { AuthKitProvider } from "@workos/authkit-tanstack-react-start/client";
 import { NuqsAdapter } from "nuqs/adapters/tanstack-router";
 import { ThemeProvider } from "../components/providers/ThemeProvider";
 import ConvexProvider from "../integrations/convex/provider";
-import WorkOSProvider from "../integrations/workos/provider";
 
 import appCss from "../styles.css?url";
 
@@ -75,23 +75,59 @@ export const Route = createRootRoute({
 		],
 	}),
 
+	// Shell is always server-rendered for HTML structure
+	shellComponent: RootShell,
+	// Component and children are client-rendered
+	ssr: false,
 	component: RootComponent,
 	notFoundComponent: NotFoundPage,
 });
 
+// Shell is always server-rendered (HTML structure)
+function RootShell({ children }: { children: React.ReactNode }) {
+	return (
+		<html lang="en" suppressHydrationWarning>
+			<head>
+				<HeadContent />
+				<script dangerouslySetInnerHTML={{ __html: themeScript }} />
+			</head>
+			<body className="h-screen overflow-hidden bg-background text-foreground antialiased">
+				{children}
+				<Scripts />
+			</body>
+		</html>
+	);
+}
+
+// Root component is client-rendered (ssr: false)
 function RootComponent() {
 	return (
-		<RootDocument>
-			<NuqsAdapter>
-				<Outlet />
-			</NuqsAdapter>
-		</RootDocument>
+		<ThemeProvider>
+			<AuthKitProvider>
+				<ConvexProvider>
+					<NuqsAdapter>
+						<Outlet />
+					</NuqsAdapter>
+					<TanStackDevtools
+						config={{
+							position: "bottom-right",
+						}}
+						plugins={[
+							{
+								name: "Tanstack Router",
+								render: <TanStackRouterDevtoolsPanel />,
+							},
+						]}
+					/>
+				</ConvexProvider>
+			</AuthKitProvider>
+		</ThemeProvider>
 	);
 }
 
 function NotFoundPage() {
 	return (
-		<RootDocument>
+		<ThemeProvider>
 			<div className="flex min-h-screen flex-col items-center justify-center bg-background">
 				<h1 className="mb-4 text-6xl font-bold">404</h1>
 				<p className="mb-8 text-xl text-muted-foreground">Page not found</p>
@@ -102,38 +138,6 @@ function NotFoundPage() {
 					Go home
 				</Link>
 			</div>
-		</RootDocument>
-	);
-}
-
-function RootDocument({ children }: { children: React.ReactNode }) {
-	return (
-		<html lang="en" suppressHydrationWarning>
-			<head>
-				<HeadContent />
-				<script dangerouslySetInnerHTML={{ __html: themeScript }} />
-			</head>
-			<body className="h-screen overflow-hidden bg-background text-foreground antialiased">
-				<ThemeProvider>
-					<WorkOSProvider>
-						<ConvexProvider>
-							{children}
-							<TanStackDevtools
-								config={{
-									position: "bottom-right",
-								}}
-								plugins={[
-									{
-										name: "Tanstack Router",
-										render: <TanStackRouterDevtoolsPanel />,
-									},
-								]}
-							/>
-						</ConvexProvider>
-					</WorkOSProvider>
-				</ThemeProvider>
-				<Scripts />
-			</body>
-		</html>
+		</ThemeProvider>
 	);
 }

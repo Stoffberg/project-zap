@@ -1,5 +1,7 @@
-import { useAuth } from "@workos-inc/authkit-react";
+import { useAuth } from "@workos/authkit-tanstack-react-start/client";
 import { useConvexAuth } from "convex/react";
+import { useCallback } from "react";
+import { getSignInUrlFn } from "../lib/auth";
 import { useCurrentUser } from "./use-current-user";
 
 /**
@@ -22,12 +24,16 @@ import { useCurrentUser } from "./use-current-user";
 export function useAppAuth() {
 	// Auth state from Convex (synced with backend)
 	const { isAuthenticated, isLoading } = useConvexAuth();
+	const user = useCurrentUser();
 
 	// Actions from WorkOS
-	const { signIn, signOut } = useAuth();
+	const { signOut } = useAuth();
 
-	// User data from Convex
-	const user = useCurrentUser();
+	// Sign in by getting the WorkOS sign-in URL and redirecting
+	const signIn = useCallback(async () => {
+		const { signInUrl } = await getSignInUrlFn();
+		window.location.href = signInUrl;
+	}, []);
 
 	return {
 		/** Whether the user is authenticated (from Convex) */

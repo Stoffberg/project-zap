@@ -1,4 +1,4 @@
-import { useAuth } from "@workos-inc/authkit-react";
+import { useAuth } from "@workos/authkit-tanstack-react-start/client";
 import { useMutation } from "convex/react";
 import { useEffect } from "react";
 import { api } from "../../convex/_generated/api";
