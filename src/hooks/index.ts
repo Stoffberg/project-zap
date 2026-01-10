@@ -1,4 +1,5 @@
 // User & Auth
+export { useAppAuth } from "./use-app-auth";
 export { useCurrentUser, useRequireUser } from "./use-current-user";
 // State Management
 export {

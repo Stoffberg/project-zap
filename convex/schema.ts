@@ -45,8 +45,6 @@ export default defineSchema({
 		name: v.string(),
 		workosUserId: v.string(),
 		avatarUrl: v.optional(v.string()),
-		/** Profile image stored in Convex file storage */
-		profileImageId: v.optional(v.id("_storage")),
 		role: userRoleValidator,
 	})
 		.index("by_email", ["email"])
@@ -63,6 +61,8 @@ export default defineSchema({
 		userId: v.optional(v.id("users")),
 		dueDate: v.optional(v.number()), // Unix timestamp
 		priority: v.optional(todoPriorityValidator),
+		/** Optional file attachment stored in Convex storage */
+		attachmentId: v.optional(v.id("_storage")),
 	})
 		.index("by_userId", ["userId"])
 		.index("by_userId_and_completed", ["userId", "completed"])

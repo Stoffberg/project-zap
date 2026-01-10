@@ -3,7 +3,7 @@ import { useAuth } from "@workos-inc/authkit-react";
 import { useMutation } from "convex/react";
 import { Calendar, Mail, Save, Shield } from "lucide-react";
 import { useState } from "react";
-import { ProfileImageUpload } from "@/components/features/users";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,7 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useCurrentUser } from "@/hooks/use-current-user";
+import { useAppAuth } from "@/hooks";
 import { api } from "../../../../convex/_generated/api";
 
 export const Route = createFileRoute("/_app/settings/")({
@@ -27,7 +27,7 @@ export const Route = createFileRoute("/_app/settings/")({
 
 function ProfileSettingsPage() {
 	const { user: workosUser } = useAuth();
-	const user = useCurrentUser();
+	const { user } = useAppAuth();
 	const updateProfile = useMutation(
 		api.users.updateProfile,
 	).withOptimisticUpdate((localStore, args) => {
@@ -39,7 +39,6 @@ function ProfileSettingsPage() {
 				{
 					...existingUser,
 					...(args.name !== undefined && { name: args.name }),
-					...(args.avatarUrl !== undefined && { avatarUrl: args.avatarUrl }),
 				},
 			);
 		}
@@ -56,6 +55,15 @@ function ProfileSettingsPage() {
 	if (user === undefined) {
 		return <ProfileSettingsSkeleton />;
 	}
+
+	const initials = user?.name
+		? user.name
+				.split(" ")
+				.map((n) => n[0])
+				.join("")
+				.toUpperCase()
+				.slice(0, 2)
+		: "U";
 
 	const handleSave = async () => {
 		setIsSaving(true);
@@ -76,12 +84,19 @@ function ProfileSettingsPage() {
 					</CardDescription>
 				</CardHeader>
 				<CardContent className="space-y-6">
-					{/* Avatar Section with Upload */}
-					<ProfileImageUpload
-						profileImageUrl={user?.profileImageUrl}
-						avatarUrl={user?.avatarUrl}
-						name={user?.name}
-					/>
+					{/* Avatar Section */}
+					<div className="flex items-center gap-4">
+						<Avatar className="h-20 w-20">
+							<AvatarImage src={user?.avatarUrl} alt={user?.name || "User"} />
+							<AvatarFallback className="text-lg">{initials}</AvatarFallback>
+						</Avatar>
+						<div>
+							<p className="text-sm font-medium">Profile Picture</p>
+							<p className="text-xs text-muted-foreground">
+								Managed by your identity provider (WorkOS)
+							</p>
+						</div>
+					</div>
 
 					<Separator />
 

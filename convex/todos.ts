@@ -1,4 +1,5 @@
 import { ConvexError, v } from "convex/values";
+import type { Doc, Id } from "./_generated/dataModel";
 import { internalMutation, mutation, query } from "./_generated/server";
 import { getAuthUser, requireAuth, requireOwnership } from "./lib/auth";
 import { validateTodoText } from "./lib/validation";
@@ -11,6 +12,7 @@ const DEMO_TODO_MAX_AGE_MS = 24 * 60 * 60 * 1000;
 // SHARED VALIDATORS
 // ============================================
 
+/** Todo with resolved attachment URL */
 const todoReturnValidator = v.object({
 	_id: v.id("todos"),
 	_creationTime: v.number(),
@@ -19,7 +21,29 @@ const todoReturnValidator = v.object({
 	userId: v.optional(v.id("users")),
 	dueDate: v.optional(v.number()),
 	priority: v.optional(todoPriorityValidator),
+	attachmentId: v.optional(v.id("_storage")),
+	attachmentUrl: v.optional(v.string()),
 });
+
+// ============================================
+// HELPER FUNCTIONS
+// ============================================
+
+/** Resolve attachment URL for a todo */
+async function resolveAttachmentUrl(
+	ctx: {
+		storage: { getUrl: (storageId: Id<"_storage">) => Promise<string | null> };
+	},
+	todo: Doc<"todos">,
+) {
+	const attachmentUrl = todo.attachmentId
+		? ((await ctx.storage.getUrl(todo.attachmentId)) ?? undefined)
+		: undefined;
+	return {
+		...todo,
+		attachmentUrl,
+	};
+}
 
 // ============================================
 // QUERIES
@@ -40,7 +64,8 @@ export const listPublic = query({
 			.order("desc")
 			.take(10);
 
-		return todos;
+		// Resolve attachment URLs
+		return Promise.all(todos.map((todo) => resolveAttachmentUrl(ctx, todo)));
 	},
 });
 
@@ -57,11 +82,14 @@ export const listMine = query({
 			return [];
 		}
 
-		return await ctx.db
+		const todos = await ctx.db
 			.query("todos")
 			.withIndex("by_userId", (q) => q.eq("userId", user._id))
 			.order("desc")
 			.collect();
+
+		// Resolve attachment URLs
+		return Promise.all(todos.map((todo) => resolveAttachmentUrl(ctx, todo)));
 	},
 });
 
@@ -72,7 +100,9 @@ export const get = query({
 	args: { todoId: v.id("todos") },
 	returns: v.union(todoReturnValidator, v.null()),
 	handler: async (ctx, args) => {
-		return await ctx.db.get(args.todoId);
+		const todo = await ctx.db.get(args.todoId);
+		if (!todo) return null;
+		return resolveAttachmentUrl(ctx, todo);
 	},
 });
 
@@ -94,11 +124,14 @@ export const listByUser = query({
 			return [];
 		}
 
-		return await ctx.db
+		const todos = await ctx.db
 			.query("todos")
 			.withIndex("by_userId", (q) => q.eq("userId", args.userId))
 			.order("desc")
 			.collect();
+
+		// Resolve attachment URLs
+		return Promise.all(todos.map((todo) => resolveAttachmentUrl(ctx, todo)));
 	},
 });
 
@@ -229,7 +262,112 @@ export const remove = mutation({
 			requireOwnership(user, todo.userId);
 		}
 
+		// Delete attachment from storage if exists
+		if (todo.attachmentId) {
+			await ctx.storage.delete(todo.attachmentId);
+		}
+
 		await ctx.db.delete(args.todoId);
+		return null;
+	},
+});
+
+// ============================================
+// FILE ATTACHMENTS
+// ============================================
+
+/**
+ * Generate a URL for uploading a file attachment.
+ * The client uploads directly to Convex storage using this URL.
+ *
+ * @example
+ * const uploadUrl = await generateUploadUrl();
+ * const response = await fetch(uploadUrl, {
+ *   method: "POST",
+ *   headers: { "Content-Type": file.type },
+ *   body: file,
+ * });
+ * const { storageId } = await response.json();
+ * await addAttachment({ todoId, storageId });
+ *
+ * @see https://docs.convex.dev/file-storage/upload-files
+ */
+export const generateUploadUrl = mutation({
+	args: {},
+	returns: v.string(),
+	handler: async (ctx) => {
+		// Require authentication to upload
+		await requireAuth(ctx);
+		return await ctx.storage.generateUploadUrl();
+	},
+});
+
+/**
+ * Add a file attachment to a todo.
+ * Deletes the old attachment if one exists.
+ */
+export const addAttachment = mutation({
+	args: {
+		todoId: v.id("todos"),
+		storageId: v.id("_storage"),
+	},
+	returns: v.null(),
+	handler: async (ctx, args) => {
+		const todo = await ctx.db.get(args.todoId);
+		if (!todo) {
+			throw new ConvexError("NOT_FOUND");
+		}
+
+		// Verify ownership
+		if (todo.userId) {
+			const user = await requireAuth(ctx);
+			requireOwnership(user, todo.userId);
+		}
+
+		// Delete old attachment if exists
+		if (todo.attachmentId) {
+			await ctx.storage.delete(todo.attachmentId);
+		}
+
+		// Update todo with new attachment
+		await ctx.db.patch(args.todoId, {
+			attachmentId: args.storageId,
+		});
+
+		return null;
+	},
+});
+
+/**
+ * Remove a file attachment from a todo.
+ */
+export const removeAttachment = mutation({
+	args: {
+		todoId: v.id("todos"),
+	},
+	returns: v.null(),
+	handler: async (ctx, args) => {
+		const todo = await ctx.db.get(args.todoId);
+		if (!todo) {
+			throw new ConvexError("NOT_FOUND");
+		}
+
+		// Verify ownership
+		if (todo.userId) {
+			const user = await requireAuth(ctx);
+			requireOwnership(user, todo.userId);
+		}
+
+		// Delete attachment from storage if exists
+		if (todo.attachmentId) {
+			await ctx.storage.delete(todo.attachmentId);
+		}
+
+		// Remove reference from todo
+		await ctx.db.patch(args.todoId, {
+			attachmentId: undefined,
+		});
+
 		return null;
 	},
 });

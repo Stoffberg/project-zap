@@ -1,9 +1,9 @@
-import { useAuth } from "@workos-inc/authkit-react";
 import { motion } from "framer-motion";
 import { Github } from "lucide-react";
+import { useAppAuth } from "@/hooks";
 
 export function CTA() {
-	const { signIn } = useAuth();
+	const { signIn } = useAppAuth();
 
 	return (
 		<section className="relative py-24 px-6 bg-violet-600 overflow-hidden">

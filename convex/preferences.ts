@@ -29,29 +29,6 @@ const preferencesReturnValidator = v.object({
 });
 
 // ============================================
-// DEFAULT VALUES
-// ============================================
-
-/**
- * Default preference values for new users
- * Used when preferences haven't been explicitly set
- */
-export const DEFAULT_PREFERENCES = {
-	// Appearance
-	theme: "system" as const,
-	reducedMotion: false,
-	compactMode: false,
-
-	// Notifications
-	emailNotifications: true,
-	pushNotifications: false,
-	todoReminders: true,
-	weeklyDigest: true,
-	mentions: true,
-	marketingEmails: false,
-};
-
-// ============================================
 // HELPERS
 // ============================================
 

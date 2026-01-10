@@ -171,6 +171,8 @@ function TodosPage() {
 											text={todo.text}
 											completed={todo.completed}
 											dueDate={todo.dueDate}
+											attachmentId={todo.attachmentId}
+											attachmentUrl={todo.attachmentUrl}
 										/>
 									))}
 								</div>

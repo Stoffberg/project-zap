@@ -1,10 +1,10 @@
-import { useAuth } from "@workos-inc/authkit-react";
 import { motion } from "framer-motion";
 import { Github } from "lucide-react";
+import { useAppAuth } from "@/hooks";
 import { DashboardPreview } from "./DashboardPreview";
 
 export function Hero() {
-	const { signIn } = useAuth();
+	const { signIn } = useAppAuth();
 
 	return (
 		<section className="relative overflow-hidden px-6 pt-16 pb-32 bg-background">

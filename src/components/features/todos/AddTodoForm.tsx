@@ -24,6 +24,7 @@ export function AddTodoForm() {
 					userId: undefined,
 					dueDate: args.dueDate,
 					priority: args.priority,
+					attachmentUrl: undefined,
 				};
 				localStore.setQuery(api.todos.listMine, {}, [
 					optimisticTodo,

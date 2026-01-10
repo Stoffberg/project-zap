@@ -1,16 +1,14 @@
 import { Link } from "@tanstack/react-router";
-import { useAuth } from "@workos-inc/authkit-react";
-import { useConvexAuth } from "convex/react";
 import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
+import { useAppAuth } from "@/hooks";
 
 interface StaticLayoutProps {
 	children: ReactNode;
 }
 
 export function StaticLayout({ children }: StaticLayoutProps) {
-	const { isAuthenticated, isLoading } = useConvexAuth();
-	const { signIn } = useAuth();
+	const { isAuthenticated, isLoading, signIn } = useAppAuth();
 
 	return (
 		<div className="min-h-screen bg-background">

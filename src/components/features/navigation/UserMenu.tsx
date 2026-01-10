@@ -1,5 +1,4 @@
 import { Link } from "@tanstack/react-router";
-import { useAuth } from "@workos-inc/authkit-react";
 import {
 	Bell,
 	Check,
@@ -30,11 +29,10 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useCurrentUser } from "@/hooks/use-current-user";
+import { useAppAuth } from "@/hooks";
 
 export function UserMenu() {
-	const { signOut } = useAuth();
-	const user = useCurrentUser();
+	const { user, signOut } = useAppAuth();
 	const { theme, setTheme } = useTheme();
 
 	if (user === undefined) {

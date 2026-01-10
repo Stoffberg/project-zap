@@ -35,3 +35,26 @@ export const DEFAULT_PAGE_SIZE = 10;
 
 /** Maximum allowed page size */
 export const MAX_PAGE_SIZE = 100;
+
+// ============================================
+// USER PREFERENCES
+// ============================================
+
+/**
+ * Default preference values for new users
+ * Used when preferences haven't been explicitly set
+ */
+export const DEFAULT_PREFERENCES = {
+	// Appearance
+	theme: "system" as const,
+	reducedMotion: false,
+	compactMode: false,
+
+	// Notifications
+	emailNotifications: true,
+	pushNotifications: false,
+	todoReminders: true,
+	weeklyDigest: true,
+	mentions: true,
+	marketingEmails: false,
+};

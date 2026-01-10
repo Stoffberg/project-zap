@@ -1,9 +1,8 @@
 import { Link } from "@tanstack/react-router";
-import { useAuth } from "@workos-inc/authkit-react";
-import { useConvexAuth } from "convex/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Github, LayoutDashboard, Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useAppAuth } from "@/hooks";
 import { LogoBrand } from "./Logo";
 
 const navLinks = [
@@ -13,8 +12,7 @@ const navLinks = [
 ];
 
 export function Header() {
-	const { signIn, signOut } = useAuth();
-	const { isAuthenticated } = useConvexAuth();
+	const { isAuthenticated, signIn, signOut } = useAppAuth();
 	const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 	const [hasScrolled, setHasScrolled] = useState(false);
 

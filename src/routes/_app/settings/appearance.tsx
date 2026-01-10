@@ -15,7 +15,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { api } from "../../../../convex/_generated/api";
-import { DEFAULT_PREFERENCES } from "../../../../convex/preferences";
+import { DEFAULT_PREFERENCES } from "../../../../convex/lib/constants";
 
 export const Route = createFileRoute("/_app/settings/appearance")({
 	component: AppearanceSettingsPage,
