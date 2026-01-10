@@ -8,7 +8,7 @@ import { nitro } from 'nitro/vite'
 
 const config = defineConfig({
   ssr: {
-    noExternal: ['@workos-inc/authkit-react'],
+    noExternal: ['@workos-inc/authkit-react', '@workos-inc/authkit-js'],
   },
   plugins: [
     devtools(),
