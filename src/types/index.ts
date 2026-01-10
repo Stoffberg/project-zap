@@ -19,7 +19,6 @@ export type User = Doc<"users">;
 export type Todo = Doc<"todos">;
 export type UserPreferences = Doc<"userPreferences">;
 export type DemoUser = Doc<"demoUsers">;
-export type DemoGridCell = Doc<"demoGrid">;
 
 // ============================================
 // DERIVED TYPES
@@ -51,18 +50,3 @@ export const DEFAULT_USER_PREFERENCES = {
 	mentions: true,
 	marketingEmails: false,
 } satisfies Omit<UserPreferences, "_id" | "_creationTime" | "userId">;
-
-// ============================================
-// UTILITY TYPES
-// ============================================
-
-/**
- * Make specific properties optional in a type
- */
-export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
-
-/**
- * Make specific properties required in a type
- */
-export type RequiredBy<T, K extends keyof T> = Omit<T, K> &
-	Required<Pick<T, K>>;

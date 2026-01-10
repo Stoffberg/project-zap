@@ -50,18 +50,6 @@ export interface ConfirmDialogProps {
  *   variant="destructive"
  *   onConfirm={handleDelete}
  * />
- *
- * @example
- * // With useConfirmDialog hook
- * const confirm = useConfirmDialog();
- *
- * const handleDelete = async () => {
- *   const confirmed = await confirm.confirm({
- *     title: "Delete item?",
- *     variant: "destructive",
- *   });
- *   if (confirmed) await deleteItem();
- * };
  */
 export function ConfirmDialog({
 	open,

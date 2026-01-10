@@ -28,15 +28,16 @@ function DashboardPage() {
 	const user = useCurrentUser();
 	const todos = useQuery(api.todos.listMine);
 
-	const completedCount = todos?.filter((t) => t.completed).length ?? 0;
-	const pendingCount = todos?.filter((t) => !t.completed).length ?? 0;
-	const totalCount = todos?.length ?? 0;
-	const completionRate =
-		totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
-
-	if (user === undefined) {
+	// Show skeleton while either user or todos are loading
+	if (user === undefined || todos === undefined) {
 		return <DashboardSkeleton />;
 	}
+
+	const completedCount = todos.filter((t) => t.completed).length;
+	const pendingCount = todos.filter((t) => !t.completed).length;
+	const totalCount = todos.length;
+	const completionRate =
+		totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
 
 	const firstName =
 		user?.name?.split(" ")[0] || user?.email?.split("@")[0] || "there";

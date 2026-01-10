@@ -21,17 +21,3 @@ import { api } from "../../convex/_generated/api";
 export function useCurrentUser() {
 	return useQuery(api.users.current);
 }
-
-/**
- * Hook that throws if user is not authenticated.
- * Use within components that are already wrapped by auth guard.
- *
- * @throws Error if loading or not authenticated
- * @returns The authenticated user
- */
-export function useRequireUser() {
-	const user = useCurrentUser();
-	if (user === undefined) throw new Error("Loading user");
-	if (user === null) throw new Error("Not authenticated");
-	return user;
-}

@@ -5,18 +5,9 @@ import {
 	USER_NAME_MAX_LENGTH,
 	USER_NAME_MIN_LENGTH,
 } from "./constants";
+import { ValidationError } from "./errors";
 
-// ============================================
-// ERROR CODES
-// ============================================
-
-export const ValidationError = {
-	INVALID_INPUT: "INVALID_INPUT",
-	TEXT_TOO_LONG: "TEXT_TOO_LONG",
-	TEXT_TOO_SHORT: "TEXT_TOO_SHORT",
-	TEXT_REQUIRED: "TEXT_REQUIRED",
-	INVALID_EMAIL: "INVALID_EMAIL",
-} as const;
+export { ValidationError };
 
 // ============================================
 // VALIDATION HELPERS

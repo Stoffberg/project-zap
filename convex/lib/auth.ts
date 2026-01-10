@@ -1,16 +1,9 @@
 import { ConvexError } from "convex/values";
 import type { Doc, Id } from "../_generated/dataModel";
 import type { MutationCtx, QueryCtx } from "../_generated/server";
+import { AuthError } from "./errors";
 
-// ============================================
-// ERROR CODES
-// ============================================
-
-export const AuthError = {
-	UNAUTHENTICATED: "UNAUTHENTICATED",
-	USER_NOT_FOUND: "USER_NOT_FOUND",
-	FORBIDDEN: "FORBIDDEN",
-} as const;
+export { AuthError };
 
 // ============================================
 // TYPES
@@ -87,23 +80,13 @@ export function requireOwnership(
 }
 
 /**
- * Check if user has a specific role.
- */
-export function hasRole(
-	user: AuthenticatedUser,
-	role: Doc<"users">["role"],
-): boolean {
-	return user.role === role;
-}
-
-/**
  * Require a specific role - throws FORBIDDEN if not matching.
  */
 export function requireRole(
 	user: AuthenticatedUser,
 	role: Doc<"users">["role"],
 ): void {
-	if (!hasRole(user, role)) {
+	if (user.role !== role) {
 		throw new ConvexError(AuthError.FORBIDDEN);
 	}
 }

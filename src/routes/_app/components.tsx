@@ -142,6 +142,8 @@ function EditUserDialog({
 				department: department || undefined,
 			});
 			onOpenChange(false);
+		} catch (error) {
+			console.error("Failed to update user:", error);
 		} finally {
 			setIsSubmitting(false);
 		}
@@ -250,6 +252,8 @@ function UserActionsCell({ user }: { user: Doc<"demoUsers"> }) {
 		setIsDeleting(true);
 		try {
 			await removeUser({ id: user._id });
+		} catch (error) {
+			console.error("Failed to delete user:", error);
 		} finally {
 			setIsDeleting(false);
 		}

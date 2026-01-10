@@ -12,7 +12,6 @@
  */
 
 import {
-	createSerializer,
 	type inferParserType,
 	parseAsArrayOf,
 	parseAsBoolean,
@@ -112,21 +111,6 @@ export const tableParams = {
 };
 
 export type TableParams = inferParserType<typeof tableParams>;
-
-/**
- * Filter state for multi-select filters.
- *
- * @example
- * const [filters, setFilters] = useQueryStates({
- *   status: parsers.stringArray,
- *   role: parsers.stringArray,
- * });
- */
-export const createFilterParams = <T extends string>(keys: T[]) => {
-	return Object.fromEntries(
-		keys.map((key) => [key, parsers.stringArray]),
-	) as Record<T, typeof parsers.stringArray>;
-};
 
 // ============================================
 // CONVENIENCE HOOKS
@@ -246,40 +230,3 @@ export function useTabParam<T extends string>(
 	);
 	return useQueryState(key, parser);
 }
-
-// ============================================
-// SERIALIZATION
-// ============================================
-
-/**
- * Create a URL serializer for search params.
- * Useful for generating URLs with search params.
- *
- * @example
- * const serialize = createUrlSerializer(searchPaginationParams);
- * const url = serialize("/users", { q: "john", page: 2 });
- * // => "/users?q=john&page=2"
- */
-export function createUrlSerializer<T extends Record<string, unknown>>(
-	params: T,
-) {
-	const serialize = createSerializer(
-		params as Parameters<typeof createSerializer>[0],
-	);
-	return (basePath: string, values: Partial<inferParserType<T>>) => {
-		return `${basePath}${serialize(values)}`;
-	};
-}
-
-// Re-export core nuqs functions for convenience
-export {
-	useQueryState,
-	useQueryStates,
-	parseAsString,
-	parseAsInteger,
-	parseAsBoolean,
-	parseAsArrayOf,
-	parseAsStringLiteral,
-	createSerializer,
-	type inferParserType,
-};

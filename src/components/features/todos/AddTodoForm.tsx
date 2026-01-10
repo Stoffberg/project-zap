@@ -47,8 +47,8 @@ export function AddTodoForm() {
 			});
 			setText("");
 			setDueDate(undefined);
-		} catch {
-			// Error handling via optimistic update rollback
+		} catch (error) {
+			console.error("Failed to add todo:", error);
 		} finally {
 			setIsLoading(false);
 		}
