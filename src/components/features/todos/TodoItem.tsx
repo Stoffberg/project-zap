@@ -16,7 +16,7 @@ interface TodoItemProps {
 export function TodoItem({ todoId, text, completed, dueDate }: TodoItemProps) {
 	const toggleTodo = useMutation(api.todos.toggle).withOptimisticUpdate(
 		(localStore, args) => {
-			const existingTodos = localStore.getQuery(api.todos.listMine);
+			const existingTodos = localStore.getQuery(api.todos.listMine, {});
 			if (existingTodos !== undefined) {
 				localStore.setQuery(
 					api.todos.listMine,
@@ -33,7 +33,7 @@ export function TodoItem({ todoId, text, completed, dueDate }: TodoItemProps) {
 
 	const removeTodo = useMutation(api.todos.remove).withOptimisticUpdate(
 		(localStore, args) => {
-			const existingTodos = localStore.getQuery(api.todos.listMine);
+			const existingTodos = localStore.getQuery(api.todos.listMine, {});
 			if (existingTodos !== undefined) {
 				localStore.setQuery(
 					api.todos.listMine,

@@ -2,32 +2,32 @@ import { useMutation } from "convex/react";
 import { startOfDay } from "date-fns";
 import { Plus } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Input } from "@/components/ui/input";
 import { api } from "../../../../convex/_generated/api";
-import type { Id } from "../../../../convex/_generated/dataModel";
 
 export function AddTodoForm() {
 	const [text, setText] = useState("");
 	const [dueDate, setDueDate] = useState<Date | undefined>();
+	const [isLoading, setIsLoading] = useState(false);
+
 	const addTodo = useMutation(api.todos.add).withOptimisticUpdate(
 		(localStore, args) => {
-			const existingTodos = localStore.getQuery(api.todos.listMine);
+			const existingTodos = localStore.getQuery(api.todos.listMine, {});
 			if (existingTodos !== undefined) {
-				const now = Date.now();
-				const newTodo = {
-					_id: crypto.randomUUID() as Id<"todos">,
-					_creationTime: now,
+				const optimisticTodo = {
+					_id: crypto.randomUUID() as unknown as (typeof existingTodos)[0]["_id"],
+					_creationTime: Date.now(),
 					text: args.text,
 					completed: false,
 					userId: undefined,
 					dueDate: args.dueDate,
 					priority: args.priority,
 				};
-				// Add to beginning since listMine orders by desc
 				localStore.setQuery(api.todos.listMine, {}, [
-					newTodo,
+					optimisticTodo,
 					...existingTodos,
 				]);
 			}
@@ -39,12 +39,20 @@ export function AddTodoForm() {
 		const trimmedText = text.trim();
 		if (!trimmedText) return;
 
-		await addTodo({
-			text: trimmedText,
-			dueDate: dueDate ? startOfDay(dueDate).getTime() : undefined,
-		});
-		setText("");
-		setDueDate(undefined);
+		setIsLoading(true);
+		try {
+			await addTodo({
+				text: trimmedText,
+				dueDate: dueDate ? startOfDay(dueDate).getTime() : undefined,
+			});
+			setText("");
+			setDueDate(undefined);
+			toast.success("Todo added!");
+		} catch {
+			toast.error("Failed to add todo");
+		} finally {
+			setIsLoading(false);
+		}
 	};
 
 	return (
@@ -67,9 +75,13 @@ export function AddTodoForm() {
 					className="w-[140px] shrink-0"
 				/>
 
-				<Button type="submit" disabled={!text.trim()} className="shrink-0">
+				<Button
+					type="submit"
+					disabled={!text.trim() || isLoading}
+					className="shrink-0"
+				>
 					<Plus className="mr-2 h-4 w-4" />
-					Add
+					{isLoading ? "Adding..." : "Add"}
 				</Button>
 			</div>
 		</form>
