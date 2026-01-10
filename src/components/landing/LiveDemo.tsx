@@ -6,7 +6,7 @@ import { Database, Shield, Zap, Radio, RotateCcw } from "lucide-react";
 
 export function LiveDemo() {
   return (
-    <section id="demo" className="dark py-24 px-6 bg-background text-foreground">
+    <section id="demo" className="py-24 px-6 bg-muted text-foreground">
       <div className="mx-auto max-w-7xl">
         {/* Header */}
         <motion.div
