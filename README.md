@@ -101,20 +101,19 @@ From the [WorkOS Dashboard](https://dashboard.workos.com):
 Add to your `.env.local`:
 
 ```bash
-# Frontend (Vite)
 VITE_WORKOS_CLIENT_ID=client_01XXXXXXXXXXXXXXXXXXXXXX
-
-# Convex backend (for JWT validation)
-WORKOS_CLIENT_ID=client_01XXXXXXXXXXXXXXXXXXXXXX
 ```
 
-**Note:** Both variables use the same Client ID value.
+### Step 6: Set Convex Environment Variable (Required)
 
-### Step 6: Set Convex Environment Variable
+**This step is required for authentication to work.** Convex needs the Client ID to validate JWT tokens from WorkOS.
 
 1. Go to your [Convex Dashboard](https://dashboard.convex.dev)
 2. Select your project → **Settings** → **Environment Variables**
-3. Add `WORKOS_CLIENT_ID` with your Client ID
+3. Click **Add** and set:
+   - **Name:** `WORKOS_CLIENT_ID`
+   - **Value:** Your Client ID (same value as `VITE_WORKOS_CLIENT_ID`)
+4. Click **Save**
 
 ### Step 7: Deploy Auth Config
 
