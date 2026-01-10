@@ -7,6 +7,9 @@ import tailwindcss from '@tailwindcss/vite'
 import { nitro } from 'nitro/vite'
 
 const config = defineConfig({
+  ssr: {
+    noExternal: ['@workos-inc/authkit-react'],
+  },
   plugins: [
     devtools(),
     nitro(),
