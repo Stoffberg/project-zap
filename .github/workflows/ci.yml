@@ -41,6 +41,9 @@ jobs:
         env:
           CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_DEPLOY_KEY }}
 
+      - name: Generate route tree
+        run: bunx @tanstack/router-cli generate
+
       - name: Run TypeScript check
         run: bun run typecheck
 
