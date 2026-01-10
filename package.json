@@ -27,7 +27,6 @@
   },
   "dependencies": {
     "@convex-dev/react-query": "0.1.0",
-    "@convex-dev/workos": "^0.0.1",
     "@hookform/resolvers": "^5.2.2",
     "@radix-ui/react-alert-dialog": "^1.1.15",
     "@radix-ui/react-avatar": "^1.1.11",
