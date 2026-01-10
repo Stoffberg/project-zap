@@ -69,5 +69,6 @@ jobs:
       - name: Build
         run: bun run build
         env:
+          CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_DEPLOY_KEY }}
           VITE_CONVEX_URL: ${{ secrets.VITE_CONVEX_URL || 'https://placeholder.convex.cloud' }}
           VITE_WORKOS_CLIENT_ID: ${{ secrets.VITE_WORKOS_CLIENT_ID || 'client_placeholder' }}
