@@ -22,11 +22,16 @@ export default function ConvexClientProvider({
 }
 
 function useAuthFromAuthKit() {
-	const { user, isLoading, getAccessToken } = useAuth();
+	const auth = useAuth();
+
+	// WorkOS hook may return undefined before initialization
+	const isLoading = auth?.isLoading ?? true;
+	const user = auth?.user;
+	const getAccessToken = auth?.getAccessToken;
 
 	const fetchAccessToken = useCallback(
 		async (_args: { forceRefreshToken: boolean }) => {
-			if (!user) {
+			if (!user || !getAccessToken) {
 				return null;
 			}
 			try {
@@ -42,7 +47,8 @@ function useAuthFromAuthKit() {
 
 	return useMemo(
 		() => ({
-			isLoading: isLoading ?? false,
+			// Keep loading until WorkOS is fully initialized
+			isLoading,
 			isAuthenticated: !!user,
 			fetchAccessToken,
 		}),
