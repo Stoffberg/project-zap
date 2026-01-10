@@ -14,8 +14,8 @@ const themeScript = `
   (function() {
     const stored = localStorage.getItem('zap-theme');
     const theme = stored === 'dark' ? 'dark'
-      : stored === 'light' ? 'light'
-      : window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      : stored === 'system' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+      : 'light';
     document.documentElement.classList.add(theme);
 
     // Set theme-color meta tag for browser chrome
