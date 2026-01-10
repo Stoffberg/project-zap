@@ -1,3 +1,2 @@
 # Mark generated files for GitHub linguist
-convex/_generated/** linguist-generated=true
 src/routeTree.gen.ts linguist-generated=true
