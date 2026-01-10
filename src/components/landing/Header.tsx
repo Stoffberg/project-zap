@@ -56,7 +56,7 @@ export function Header() {
         {/* Desktop Auth Buttons */}
         <div className="hidden lg:flex items-center justify-end gap-3">
           <a
-            href="https://github.com"
+            href="https://github.com/Stoffberg/project-zap"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 rounded-md border border-border bg-card px-3 py-1.5 text-sm font-medium text-card-foreground hover:bg-accent transition-colors"
@@ -137,7 +137,7 @@ export function Header() {
 
               <div className="mt-4 flex flex-col gap-3 pt-2">
                 <a
-                  href="https://github.com"
+                  href="https://github.com/Stoffberg/project-zap"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center gap-2 rounded-md border border-border py-2.5 text-sm font-medium text-card-foreground"

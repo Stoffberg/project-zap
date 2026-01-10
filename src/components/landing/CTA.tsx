@@ -56,7 +56,7 @@ export function CTA() {
           </button>
 
           <a
-            href="https://github.com"
+            href="https://github.com/Stoffberg/project-zap"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 rounded-md border border-white/30 bg-white/10 px-4 py-2 text-sm font-medium text-white hover:bg-white/20 transition-colors"

@@ -16,7 +16,7 @@ const footerLinks = {
     { label: "Changelog", href: "#" },
   ],
   community: [
-    { label: "GitHub", href: "https://github.com" },
+    { label: "GitHub", href: "https://github.com/Stoffberg/project-zap" },
     { label: "Discord", href: "#" },
     { label: "Twitter", href: "#" },
     { label: "Blog", href: "#" },
@@ -24,7 +24,7 @@ const footerLinks = {
 };
 
 const socialLinks = [
-  { icon: Github, href: "https://github.com", label: "GitHub" },
+  { icon: Github, href: "https://github.com/Stoffberg/project-zap", label: "GitHub" },
   { icon: Twitter, href: "#", label: "Twitter" },
   { icon: Mail, href: "#", label: "Email" },
 ];
