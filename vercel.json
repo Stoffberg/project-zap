@@ -1,5 +1,5 @@
 {
-	"regions": ["iad1"],
+	"regions": ["cpt1"],
 	"functions": {
 		"api/**/*.ts": {
 			"maxDuration": 30
