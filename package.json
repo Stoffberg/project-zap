@@ -5,7 +5,7 @@
   "packageManager": "bun@1.2.18",
   "scripts": {
     "dev": "vite dev --port 3000",
-    "build": "vite build",
+    "build": "convex codegen && vite build",
     "preview": "vite preview",
     "test": "vitest run",
     "format": "biome format --write",
