@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery } from "convex/react";
 import { Check, Monitor, Moon, Sun } from "lucide-react";
-import { toast } from "sonner";
 import { useTheme } from "@/components/providers/ThemeProvider";
 import {
 	Card,
@@ -60,25 +59,16 @@ function AppearanceSettingsPage() {
 	const compactMode =
 		preferences?.compactMode ?? DEFAULT_PREFERENCES.compactMode;
 
-	const handleThemeChange = async (newTheme: Theme) => {
+	const handleThemeChange = (newTheme: Theme) => {
 		setTheme(newTheme);
-		try {
-			await updateAppearance({ theme: newTheme });
-		} catch {
-			toast.error("Failed to save theme preference");
-		}
+		updateAppearance({ theme: newTheme });
 	};
 
-	const handleToggle = async (
+	const handleToggle = (
 		key: "reducedMotion" | "compactMode",
 		value: boolean,
 	) => {
-		try {
-			await updateAppearance({ [key]: value });
-			toast.success("Appearance preference updated");
-		} catch {
-			toast.error("Failed to update preference");
-		}
+		updateAppearance({ [key]: value });
 	};
 
 	const themeOptions = [

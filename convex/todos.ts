@@ -1,8 +1,11 @@
 import { ConvexError, v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { internalMutation, mutation, query } from "./_generated/server";
 import { getAuthUser, requireAuth, requireOwnership } from "./lib/auth";
 import { validateTodoText } from "./lib/validation";
 import { todoPriorityValidator } from "./schema";
+
+/** 24 hours in milliseconds */
+const DEMO_TODO_MAX_AGE_MS = 24 * 60 * 60 * 1000;
 
 // ============================================
 // SHARED VALIDATORS
@@ -228,5 +231,39 @@ export const remove = mutation({
 
 		await ctx.db.delete(args.todoId);
 		return null;
+	},
+});
+
+// ============================================
+// INTERNAL FUNCTIONS (for cron jobs)
+// ============================================
+
+/**
+ * Clean up old demo todos (todos without userId).
+ * Removes demo todos older than 24 hours to prevent clutter.
+ * Called by cron job.
+ */
+export const cleanupOldDemoTodos = internalMutation({
+	args: {},
+	returns: v.number(),
+	handler: async (ctx) => {
+		const cutoffTime = Date.now() - DEMO_TODO_MAX_AGE_MS;
+
+		// Get all demo todos (no userId)
+		const demoTodos = await ctx.db
+			.query("todos")
+			.withIndex("by_userId", (q) => q.eq("userId", undefined))
+			.collect();
+
+		// Delete old ones
+		let deletedCount = 0;
+		for (const todo of demoTodos) {
+			if (todo._creationTime < cutoffTime) {
+				await ctx.db.delete(todo._id);
+				deletedCount++;
+			}
+		}
+
+		return deletedCount;
 	},
 });

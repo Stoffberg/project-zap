@@ -3,8 +3,7 @@ import { useAuth } from "@workos-inc/authkit-react";
 import { useMutation } from "convex/react";
 import { Calendar, Mail, Save, Shield } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ProfileImageUpload } from "@/components/features/users";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -58,22 +57,10 @@ function ProfileSettingsPage() {
 		return <ProfileSettingsSkeleton />;
 	}
 
-	const initials = user?.name
-		? user.name
-				.split(" ")
-				.map((n) => n[0])
-				.join("")
-				.toUpperCase()
-				.slice(0, 2)
-		: "U";
-
 	const handleSave = async () => {
 		setIsSaving(true);
 		try {
 			await updateProfile({ name: name.trim() || undefined });
-			toast.success("Profile updated successfully");
-		} catch {
-			toast.error("Failed to update profile");
 		} finally {
 			setIsSaving(false);
 		}
@@ -89,19 +76,12 @@ function ProfileSettingsPage() {
 					</CardDescription>
 				</CardHeader>
 				<CardContent className="space-y-6">
-					{/* Avatar Section */}
-					<div className="flex items-center gap-4">
-						<Avatar className="h-20 w-20">
-							<AvatarImage src={user?.avatarUrl} alt={user?.name || "User"} />
-							<AvatarFallback className="text-lg">{initials}</AvatarFallback>
-						</Avatar>
-						<div>
-							<p className="text-sm font-medium">Profile Picture</p>
-							<p className="text-xs text-muted-foreground">
-								Managed by your identity provider
-							</p>
-						</div>
-					</div>
+					{/* Avatar Section with Upload */}
+					<ProfileImageUpload
+						profileImageUrl={user?.profileImageUrl}
+						avatarUrl={user?.avatarUrl}
+						name={user?.name}
+					/>
 
 					<Separator />
 

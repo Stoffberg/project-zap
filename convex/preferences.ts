@@ -1,4 +1,6 @@
 import { v } from "convex/values";
+import type { Id } from "./_generated/dataModel";
+import type { MutationCtx } from "./_generated/server";
 import { mutation, query } from "./_generated/server";
 import { getAuthUser, requireAuth } from "./lib/auth";
 import { themeValidator } from "./schema";
@@ -48,6 +50,30 @@ export const DEFAULT_PREFERENCES = {
 	mentions: true,
 	marketingEmails: false,
 };
+
+// ============================================
+// HELPERS
+// ============================================
+
+/**
+ * Upsert user preferences - creates if not exists, patches if exists
+ */
+async function upsertPreferences(
+	ctx: MutationCtx,
+	userId: Id<"users">,
+	updates: Record<string, unknown>,
+) {
+	const existing = await ctx.db
+		.query("userPreferences")
+		.withIndex("by_userId", (q) => q.eq("userId", userId))
+		.unique();
+
+	if (existing) {
+		await ctx.db.patch(existing._id, updates);
+	} else {
+		await ctx.db.insert("userPreferences", { userId, ...updates });
+	}
+}
 
 // ============================================
 // QUERIES
@@ -115,27 +141,7 @@ export const updateAppearance = mutation({
 	returns: v.null(),
 	handler: async (ctx, args) => {
 		const user = await requireAuth(ctx);
-
-		const existing = await ctx.db
-			.query("userPreferences")
-			.withIndex("by_userId", (q) => q.eq("userId", user._id))
-			.unique();
-
-		if (existing) {
-			await ctx.db.patch(existing._id, {
-				theme: args.theme,
-				reducedMotion: args.reducedMotion,
-				compactMode: args.compactMode,
-			});
-		} else {
-			await ctx.db.insert("userPreferences", {
-				userId: user._id,
-				theme: args.theme,
-				reducedMotion: args.reducedMotion,
-				compactMode: args.compactMode,
-			});
-		}
-
+		await upsertPreferences(ctx, user._id, args);
 		return null;
 	},
 });
@@ -156,33 +162,7 @@ export const updateNotifications = mutation({
 	returns: v.null(),
 	handler: async (ctx, args) => {
 		const user = await requireAuth(ctx);
-
-		const existing = await ctx.db
-			.query("userPreferences")
-			.withIndex("by_userId", (q) => q.eq("userId", user._id))
-			.unique();
-
-		if (existing) {
-			await ctx.db.patch(existing._id, {
-				emailNotifications: args.emailNotifications,
-				pushNotifications: args.pushNotifications,
-				todoReminders: args.todoReminders,
-				weeklyDigest: args.weeklyDigest,
-				mentions: args.mentions,
-				marketingEmails: args.marketingEmails,
-			});
-		} else {
-			await ctx.db.insert("userPreferences", {
-				userId: user._id,
-				emailNotifications: args.emailNotifications,
-				pushNotifications: args.pushNotifications,
-				todoReminders: args.todoReminders,
-				weeklyDigest: args.weeklyDigest,
-				mentions: args.mentions,
-				marketingEmails: args.marketingEmails,
-			});
-		}
-
+		await upsertPreferences(ctx, user._id, args);
 		return null;
 	},
 });

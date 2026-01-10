@@ -25,7 +25,6 @@ import {
 	Zap,
 } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
 // UI Components
 import {
 	Avatar,
@@ -142,10 +141,7 @@ function EditUserDialog({
 				status,
 				department: department || undefined,
 			});
-			toast.success("User updated");
 			onOpenChange(false);
-		} catch {
-			toast.error("Failed to update user");
 		} finally {
 			setIsSubmitting(false);
 		}
@@ -254,9 +250,6 @@ function UserActionsCell({ user }: { user: Doc<"demoUsers"> }) {
 		setIsDeleting(true);
 		try {
 			await removeUser({ id: user._id });
-			toast.success("User deleted");
-		} catch {
-			toast.error("Failed to delete user");
 		} finally {
 			setIsDeleting(false);
 		}

@@ -8,7 +8,6 @@ import {
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { NuqsAdapter } from "nuqs/adapters/tanstack-router";
-import { Toaster } from "sonner";
 import { ThemeProvider } from "../components/providers/ThemeProvider";
 import ConvexProvider from "../integrations/convex/provider";
 import WorkOSProvider from "../integrations/workos/provider";
@@ -119,7 +118,6 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 					<WorkOSProvider>
 						<ConvexProvider>
 							{children}
-							<Toaster position="bottom-right" richColors />
 							<TanStackDevtools
 								config={{
 									position: "bottom-right",

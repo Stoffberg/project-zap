@@ -8,7 +8,6 @@ import {
 	Target,
 	TrendingUp,
 } from "lucide-react";
-import { useState } from "react";
 import { AddTodoForm } from "@/components/features/todos/AddTodoForm";
 import { TodoItem } from "@/components/features/todos/TodoItem";
 import { Badge } from "@/components/ui/badge";
@@ -22,15 +21,18 @@ import {
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useTabParam } from "@/hooks";
 import { api } from "../../../convex/_generated/api";
 
 export const Route = createFileRoute("/_app/todos")({
 	component: TodosPage,
 });
 
+const TODO_TABS = ["all", "pending", "completed"] as const;
+
 function TodosPage() {
 	const todos = useQuery(api.todos.listMine);
-	const [activeTab, setActiveTab] = useState("all");
+	const [activeTab, setActiveTab] = useTabParam("tab", TODO_TABS);
 
 	if (todos === undefined) {
 		return <TodosPageSkeleton />;
@@ -115,7 +117,10 @@ function TodosPage() {
 				<CardContent className="space-y-4">
 					<AddTodoForm />
 
-					<Tabs value={activeTab} onValueChange={setActiveTab}>
+					<Tabs
+						value={activeTab}
+						onValueChange={(value) => setActiveTab(value as typeof activeTab)}
+					>
 						<TabsList className="grid w-full grid-cols-3">
 							<TabsTrigger value="all" className="gap-2">
 								All

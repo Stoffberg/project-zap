@@ -2,7 +2,6 @@ import { useMutation } from "convex/react";
 import { startOfDay } from "date-fns";
 import { Plus } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Input } from "@/components/ui/input";
@@ -47,9 +46,8 @@ export function AddTodoForm() {
 			});
 			setText("");
 			setDueDate(undefined);
-			toast.success("Todo added!");
 		} catch {
-			toast.error("Failed to add todo");
+			// Error handling via optimistic update rollback
 		} finally {
 			setIsLoading(false);
 		}

@@ -45,6 +45,8 @@ export default defineSchema({
 		name: v.string(),
 		workosUserId: v.string(),
 		avatarUrl: v.optional(v.string()),
+		/** Profile image stored in Convex file storage */
+		profileImageId: v.optional(v.id("_storage")),
 		role: userRoleValidator,
 	})
 		.index("by_email", ["email"])

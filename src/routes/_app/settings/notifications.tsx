@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery } from "convex/react";
 import { Bell, Mail, MessageSquare, Smartphone } from "lucide-react";
-import { toast } from "sonner";
 import {
 	Card,
 	CardContent,
@@ -71,13 +70,8 @@ function NotificationSettingsPage() {
 	const marketingEmails =
 		preferences?.marketingEmails ?? DEFAULT_PREFERENCES.marketingEmails;
 
-	const handleToggle = async (key: string, value: boolean) => {
-		try {
-			await updateNotifications({ [key]: value });
-			toast.success("Notification preference updated");
-		} catch {
-			toast.error("Failed to update preference");
-		}
+	const handleToggle = (key: string, value: boolean) => {
+		updateNotifications({ [key]: value });
 	};
 
 	return (
