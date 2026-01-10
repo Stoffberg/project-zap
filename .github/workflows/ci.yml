@@ -39,7 +39,7 @@ jobs:
       - name: Generate Convex types
         run: bunx convex codegen
         env:
-          CONVEX_DEPLOYMENT: ${{ secrets.CONVEX_DEPLOYMENT }}
+          CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_DEPLOY_KEY }}
 
       - name: Run TypeScript check
         run: bun run typecheck
@@ -61,7 +61,7 @@ jobs:
       - name: Generate Convex types
         run: bunx convex codegen
         env:
-          CONVEX_DEPLOYMENT: ${{ secrets.CONVEX_DEPLOYMENT }}
+          CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_DEPLOY_KEY }}
 
       - name: Build
         run: bun run build
