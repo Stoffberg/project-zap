@@ -6,7 +6,7 @@ import { Database, Shield, Zap, Radio, RotateCcw } from "lucide-react";
 
 export function LiveDemo() {
   return (
-    <section id="demo" className="py-24 px-6 bg-muted/50">
+    <section id="demo" className="py-24 px-6 bg-zinc-900 text-white">
       <div className="mx-auto max-w-7xl">
         {/* Header */}
         <motion.div
@@ -24,10 +24,10 @@ export function LiveDemo() {
             <Radio className="h-4 w-4" />
             LIVE DEMO
           </motion.span>
-          <h2 className="text-4xl font-bold text-foreground md:text-5xl">
+          <h2 className="text-4xl font-bold text-white md:text-5xl">
             See Convex in Action
           </h2>
-          <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="mt-4 text-lg text-zinc-400 max-w-2xl mx-auto">
             This demo is live, data syncs in real-time across all visitors. Try opening in multiple tabs!
           </p>
         </motion.div>
