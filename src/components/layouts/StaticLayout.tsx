@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
-import { useAppAuth } from "@/hooks";
+import { useAppAuth } from "@/shared";
 
 interface StaticLayoutProps {
 	children: ReactNode;

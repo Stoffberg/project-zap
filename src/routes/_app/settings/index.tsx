@@ -1,5 +1,5 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { isMobileDevice } from "@/hooks/use-mobile";
+import { isMobileDevice } from "@/shared";
 
 export const Route = createFileRoute("/_app/settings/")({
 	beforeLoad: () => {

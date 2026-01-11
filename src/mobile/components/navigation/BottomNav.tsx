@@ -20,6 +20,14 @@ const navItems = [
 	},
 ];
 
+/**
+ * Mobile bottom navigation bar.
+ *
+ * Features:
+ * - Fixed to bottom of screen
+ * - Safe area support for notched devices
+ * - Touch-optimized tap targets (44x44px minimum)
+ */
 export function BottomNav() {
 	const location = useLocation();
 

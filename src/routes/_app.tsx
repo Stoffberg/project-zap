@@ -1,8 +1,10 @@
 import { createFileRoute, Outlet, useNavigate } from "@tanstack/react-router";
 import { Authenticated, AuthLoading, Unauthenticated } from "convex/react";
 import { useEffect } from "react";
-import { AppLayout } from "@/components/layouts/AppLayout";
+import { AppShell as DesktopAppShell } from "@/desktop";
 import { useSyncUser } from "@/hooks/use-sync-user";
+import { AppShell as MobileAppShell } from "@/mobile";
+import { useMobile } from "@/shared";
 
 export const Route = createFileRoute("/_app")({
 	component: AppLayoutRoute,
@@ -28,10 +30,14 @@ function AuthenticatedApp() {
 	// Sync WorkOS user to Convex database
 	useSyncUser();
 
+	// Platform switch point for app shell
+	const isMobile = useMobile();
+	const AppShell = isMobile ? MobileAppShell : DesktopAppShell;
+
 	return (
-		<AppLayout>
+		<AppShell>
 			<Outlet />
-		</AppLayout>
+		</AppShell>
 	);
 }
 

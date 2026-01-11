@@ -1,11 +1,13 @@
 import { useAuth } from "@workos/authkit-tanstack-react-start/client";
 import { useConvexAuth } from "convex/react";
 import { useCallback } from "react";
-import { getSignInUrlFn } from "../lib/auth";
+import { getSignInUrlFn } from "../../lib/auth";
 import { useCurrentUser } from "./use-current-user";
 
 /**
  * Unified authentication hook combining Convex auth state with WorkOS actions.
+ *
+ * Used by both mobile and desktop products.
  *
  * This is the primary auth hook for the app. It provides:
  * - Auth state from Convex (synced with backend)

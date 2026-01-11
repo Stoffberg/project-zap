@@ -18,7 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAppAuth } from "@/hooks";
+import { useAppAuth } from "@/shared";
 import { api } from "../../../../convex/_generated/api";
 
 export const Route = createFileRoute("/_app/settings/profile")({

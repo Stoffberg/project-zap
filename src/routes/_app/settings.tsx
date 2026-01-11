@@ -6,8 +6,8 @@ import {
 } from "@tanstack/react-router";
 import { ChevronRight, Palette, Settings, User } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useMobile } from "@/hooks";
 import { cn } from "@/lib/utils";
+import { useMobile } from "@/shared";
 
 export const Route = createFileRoute("/_app/settings")({
 	component: SettingsLayout,

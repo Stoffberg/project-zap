@@ -29,7 +29,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAppAuth } from "@/hooks";
+import { useAppAuth } from "@/shared";
 
 export function UserMenu() {
 	const { user, signOut } = useAppAuth();

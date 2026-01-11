@@ -1,47 +1,27 @@
 import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { type ReactNode, useState } from "react";
 import { AppBreadcrumb } from "@/components/features/navigation/AppBreadcrumb";
-import { BottomNav } from "@/components/features/navigation/BottomNav";
 import { MobileSidebar } from "@/components/features/navigation/MobileSidebar";
-import { Sidebar } from "@/components/features/navigation/Sidebar";
 import { UserMenu } from "@/components/features/navigation/UserMenu";
 import { Button } from "@/components/ui/button";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { useMobile } from "@/hooks";
+import { Sidebar } from "../components/navigation/Sidebar";
 
-interface AppLayoutProps {
+interface AppShellProps {
 	children: ReactNode;
 }
 
-export function AppLayout({ children }: AppLayoutProps) {
+/**
+ * Desktop app shell with sidebar navigation.
+ *
+ * Features:
+ * - Collapsible sidebar
+ * - Top header with breadcrumb and user menu
+ * - Mobile sidebar for tablet breakpoint
+ */
+export function AppShell({ children }: AppShellProps) {
 	const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-	const isMobile = useMobile();
 
-	// Mobile layout - bottom nav, no sidebar
-	if (isMobile) {
-		return (
-			<TooltipProvider>
-				<div className="flex min-h-screen flex-col bg-background">
-					{/* Main Content - account for bottom nav height */}
-					<main
-						className="flex-1 overflow-y-auto"
-						style={{
-							// Add safe area padding for bottom nav + bottom inset
-							paddingBottom:
-								"calc(4rem + env(safe-area-inset-bottom, 0px) + 1rem)",
-						}}
-					>
-						{children}
-					</main>
-
-					{/* Bottom Navigation */}
-					<BottomNav />
-				</div>
-			</TooltipProvider>
-		);
-	}
-
-	// Desktop layout - sidebar with header
 	return (
 		<TooltipProvider>
 			<div className="flex h-screen overflow-hidden bg-background">

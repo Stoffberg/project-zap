@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "framer-motion";
 import { Github, LayoutDashboard, Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useAppAuth } from "@/hooks";
+import { useAppAuth } from "@/shared";
 import { LogoBrand } from "./Logo";
 
 const navLinks = [

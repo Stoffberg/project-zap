@@ -1,8 +1,10 @@
 import { useQuery } from "convex/react";
-import { api } from "../../convex/_generated/api";
+import { api } from "../../../convex/_generated/api";
 
 /**
  * Hook to get the current authenticated user from Convex.
+ *
+ * Used by both mobile and desktop products.
  *
  * @returns The current user, null if not authenticated, or undefined if loading.
  *

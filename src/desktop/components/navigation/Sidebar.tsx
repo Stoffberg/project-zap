@@ -31,6 +31,14 @@ const navItems = [
 	},
 ];
 
+/**
+ * Desktop sidebar navigation.
+ *
+ * Features:
+ * - Collapsible with icon-only mode
+ * - Active state highlighting
+ * - Tooltip support when collapsed
+ */
 export function Sidebar({ collapsed }: SidebarProps) {
 	const location = useLocation();
 

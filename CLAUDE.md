@@ -22,19 +22,91 @@ bunx shadcn@latest add [component]  # Add UI component
 
 ## Structure
 ```
-src/routes/           # File-based routing
-├── index.tsx         # Public landing
-├── _app.tsx          # Auth guard layout
-└── _app/*.tsx        # Protected (NO loaders, use useQuery)
-
-src/components/
-├── ui/               # shadcn primitives
-├── features/<domain>/ # Feature components
-└── layouts/          # Page layouts
+src/
+├── routes/             # File-based routing (platform switch points)
+│   ├── index.tsx       # Public landing
+│   ├── _app.tsx        # Auth guard + platform shell switch
+│   └── _app/*.tsx      # Protected routes (switch mobile/desktop)
+│
+├── shared/             # Shared code (both products)
+│   ├── hooks/          # Data hooks: useTodos, useCurrentUser, useMobile
+│   └── lib/            # Utilities: withPlatform, cn
+│
+├── desktop/            # Desktop product
+│   ├── layouts/        # AppShell (sidebar navigation)
+│   ├── pages/          # Dashboard, Todos, Settings
+│   └── components/     # Desktop-specific components
+│
+├── mobile/             # Mobile product
+│   ├── layouts/        # AppShell (bottom navigation)
+│   ├── pages/          # Dashboard, Todos, Settings
+│   └── components/     # Touch-optimized components
+│
+└── components/
+    ├── ui/             # shadcn primitives
+    └── features/       # Shared feature components
 
 convex/
-├── schema.ts         # Database schema
-└── <domain>.ts       # Queries & mutations
+├── schema.ts           # Database schema
+└── <domain>.ts         # Queries & mutations
+```
+
+## Separate Products Architecture
+
+Mobile and desktop are **separate products** sharing a Convex backend. This creates clear boundaries for AI-assisted development.
+
+### Key Principles
+
+1. **Single switch point** - Platform detection happens ONLY in route files:
+```tsx
+// src/routes/_app/dashboard.tsx
+import { DashboardPage as DesktopDashboard } from "@/desktop";
+import { DashboardPage as MobileDashboard } from "@/mobile";
+import { useMobile } from "@/shared";
+
+function DashboardPage() {
+  const isMobile = useMobile();
+  return isMobile ? <MobileDashboard /> : <DesktopDashboard />;
+}
+```
+
+2. **Hook as Controller** - Shared hooks contain all data logic:
+```tsx
+// In mobile/pages/Todos.tsx or desktop/pages/Todos.tsx
+import { useTodos } from "@/shared";
+
+function TodosPage() {
+  const { todos, toggleTodo, addTodo, filter, setFilter } = useTodos();
+  // Pure view - no data fetching, just render
+}
+```
+
+3. **No platform detection in pages** - Mobile and desktop pages are pure views:
+```tsx
+// WRONG - platform detection inside page
+function TodosPage() {
+  const isMobile = useMobile();  // ❌ Never do this in pages
+  return isMobile ? <MobileUI /> : <DesktopUI />;
+}
+
+// CORRECT - page is pure view, selected by route
+function MobileTodosPage() {
+  return <TouchOptimizedUI />;  // ✅ Just render mobile UI
+}
+```
+
+### Import Patterns
+```tsx
+// Shared hooks and utilities
+import { useTodos, useCurrentUser, useMobile } from "@/shared";
+
+// Desktop components
+import { DashboardPage, TodosPage } from "@/desktop";
+import { AppShell } from "@/desktop/layouts";
+
+// Mobile components
+import { DashboardPage, TodosPage } from "@/mobile";
+import { AppShell } from "@/mobile/layouts";
 ```
 
 ---
@@ -392,18 +464,18 @@ function TodoList() {
 
 ## Core Principles
 
-1. **Device detection over screen size** - Use `useMobile()` hook which checks user agent + touch + pointer, not just viewport width. A resized desktop window is NOT mobile.
+1. **Separate products, not responsive** - Mobile and desktop are separate products in `src/mobile/` and `src/desktop/`. Platform switch happens ONCE at route level.
 
-2. **Touch targets minimum 44px** - All interactive elements must have 44x44px touch area. Visual element can be smaller, wrap in larger touch target:
+2. **Touch targets minimum 44px** - All interactive elements must have 44x44px touch area:
 ```tsx
 <button className="h-11 w-11 flex items-center justify-center">
   <span className="h-5 w-5 rounded-full border-2">...</span>
 </button>
 ```
 
-3. **Inputs in sheets, not pages** - Forms open in bottom sheets (`<Sheet side="bottom">`), never inline on page. Exception: search/filter inputs.
+3. **Inputs in sheets, not pages** - Forms open in bottom sheets (`<Sheet side="bottom">`). Exception: search/filter inputs.
 
-4. **No hover-dependent interactions** - Everything must work with tap. Tooltips are nice-to-have, not required.
+4. **No hover-dependent interactions** - Everything must work with tap.
 
 5. **16px minimum font for inputs** - Prevents iOS zoom on focus. Use `text-base` class.
 
@@ -412,35 +484,35 @@ function TodoList() {
 style={{ paddingBottom: "calc(1rem + env(safe-area-inset-bottom, 0px))" }}
 ```
 
-7. **Separate mobile layouts** - Don't just hide/show elements. Create distinct mobile experiences:
+7. **Cards over tables** - Tables become card lists on mobile.
+
+8. **Bottom nav over sidebar** - Mobile uses `BottomNav`, desktop uses `Sidebar`. Never both.
+
+## Platform Detection
 ```tsx
-if (isMobile) return <MobileLayout />;
-return <DesktopLayout />;
+// In route files ONLY (the single switch point)
+import { useMobile } from "@/shared";
+
+function DashboardPage() {
+  const isMobile = useMobile();
+  return isMobile ? <MobileDashboard /> : <DesktopDashboard />;
+}
+
+// For route loaders (non-reactive)
+import { isMobileDevice } from "@/shared";
+if (!isMobileDevice()) throw redirect({ to: "/settings/profile" });
 ```
 
-8. **Cards over tables** - Tables become card lists on mobile. Use `MobileDataList` component.
-
-9. **Bottom nav over sidebar** - Mobile uses `BottomNav`, desktop uses `Sidebar`. Never both.
-
-10. **Error feedback always visible** - Silent failures are unacceptable. Show inline errors.
-
-## Mobile Hooks
-```tsx
-import { useMobile, isMobileDevice } from "@/hooks/use-mobile";
-
-// In components (reactive)
-const isMobile = useMobile();
-
-// In route loaders (non-reactive)
-if (!isMobileDevice()) throw redirect({ to: "/desktop-route" });
+## Mobile Product Structure
 ```
-
-## Mobile Components
-- `BottomNav` - Bottom navigation bar
-- `MobileHeader` - Simple page header
-- `AddTodoSheet` - FAB + sheet pattern for forms
-- `MobileDataList` - Card-based data display
-- `MobileSearchBar` - Touch-optimized search
+src/mobile/
+├── layouts/AppShell.tsx      # Bottom nav shell
+├── pages/                    # Pure view components
+│   ├── Dashboard.tsx
+│   └── Todos.tsx
+└── components/
+    └── navigation/BottomNav.tsx
+```
 
 ---
 

@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Github } from "lucide-react";
-import { useAppAuth } from "@/hooks";
+import { useAppAuth } from "@/shared";
 import { DashboardPreview } from "./DashboardPreview";
 
 export function Hero() {
