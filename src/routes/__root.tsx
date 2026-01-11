@@ -14,9 +14,10 @@ import ConvexProvider from "../integrations/convex/provider";
 
 import appCss from "../styles.css?url";
 
-// Script to prevent flash of wrong theme and set theme-color
+// Script to prevent flash of wrong theme, set theme-color, and register service worker
 const themeScript = `
   (function() {
+    // Theme setup
     const stored = localStorage.getItem('zap-theme');
     const theme = stored === 'dark' ? 'dark'
       : stored === 'system' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
@@ -32,6 +33,15 @@ const themeScript = `
       document.head.appendChild(meta);
     }
     meta.content = themeColor;
+
+    // Register service worker for PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/sw.js').catch(function(err) {
+          console.log('ServiceWorker registration failed:', err);
+        });
+      });
+    }
   })();
 `;
 
@@ -43,10 +53,35 @@ export const Route = createRootRoute({
 			},
 			{
 				name: "viewport",
-				content: "width=device-width, initial-scale=1",
+				content: "width=device-width, initial-scale=1, viewport-fit=cover",
 			},
 			{
 				title: "Project Zap",
+			},
+			{
+				name: "description",
+				content: "Modern task management with real-time sync",
+			},
+			// PWA meta tags
+			{
+				name: "apple-mobile-web-app-capable",
+				content: "yes",
+			},
+			{
+				name: "apple-mobile-web-app-status-bar-style",
+				content: "black-translucent",
+			},
+			{
+				name: "apple-mobile-web-app-title",
+				content: "Zap",
+			},
+			{
+				name: "mobile-web-app-capable",
+				content: "yes",
+			},
+			{
+				name: "format-detection",
+				content: "telephone=no",
 			},
 		],
 		links: [
@@ -67,6 +102,16 @@ export const Route = createRootRoute({
 			{
 				rel: "apple-touch-icon",
 				href: "/logo192.png",
+			},
+			{
+				rel: "apple-touch-icon",
+				sizes: "192x192",
+				href: "/logo192.png",
+			},
+			{
+				rel: "apple-touch-icon",
+				sizes: "512x512",
+				href: "/logo512.png",
 			},
 			{
 				rel: "manifest",

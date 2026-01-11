@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Offline - Project Zap</title>
+  <meta name="theme-color" content="#7c3aed" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+      color: #fafafa;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 400px;
+      width: 100%;
+    }
+
+    .icon {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 1.5rem;
+      background: rgba(124, 58, 237, 0.15);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .icon svg {
+      width: 40px;
+      height: 40px;
+      stroke: #7c3aed;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+
+    p {
+      color: #a1a1aa;
+      font-size: 0.9375rem;
+      line-height: 1.5;
+      margin-bottom: 2rem;
+    }
+
+    .retry-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      background: #7c3aed;
+      color: white;
+      border: none;
+      padding: 0.875rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 500;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      width: 100%;
+      max-width: 200px;
+      /* Touch-friendly sizing */
+      min-height: 48px;
+    }
+
+    .retry-btn:hover {
+      background: #6d28d9;
+    }
+
+    .retry-btn:active {
+      transform: scale(0.98);
+    }
+
+    .retry-btn svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .status {
+      margin-top: 2rem;
+      padding: 0.75rem 1rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 0.5rem;
+      font-size: 0.8125rem;
+      color: #71717a;
+    }
+
+    .status.online {
+      background: rgba(34, 197, 94, 0.1);
+      color: #22c55e;
+    }
+
+    /* Safe area padding for PWA */
+    @supports (padding-bottom: env(safe-area-inset-bottom)) {
+      body {
+        padding-bottom: calc(1.5rem + env(safe-area-inset-bottom));
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="icon">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M8.288 15.038a5.25 5.25 0 017.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0M12.53 18.22l-.53.53-.53-.53a.75.75 0 011.06 0z" />
+      </svg>
+    </div>
+
+    <h1>You're Offline</h1>
+    <p>It looks like you've lost your internet connection. Don't worry - your data is safe and will sync when you're back online.</p>
+
+    <button class="retry-btn" onclick="window.location.reload()">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+      </svg>
+      Try Again
+    </button>
+
+    <div class="status" id="status">
+      Waiting for connection...
+    </div>
+  </div>
+
+  <script>
+    const statusEl = document.getElementById('status');
+
+    function updateStatus() {
+      if (navigator.onLine) {
+        statusEl.textContent = 'Connection restored! Refreshing...';
+        statusEl.classList.add('online');
+        setTimeout(() => window.location.reload(), 1000);
+      } else {
+        statusEl.textContent = 'Waiting for connection...';
+        statusEl.classList.remove('online');
+      }
+    }
+
+    window.addEventListener('online', updateStatus);
+    window.addEventListener('offline', updateStatus);
+    updateStatus();
+  </script>
+</body>
+</html>

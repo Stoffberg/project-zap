@@ -121,6 +121,13 @@ export {
 } from "./form";
 export { Input } from "./input";
 export { Label } from "./label";
+// Mobile Components
+export {
+	MobileDataCard,
+	MobileDataList,
+	MobilePagination,
+	MobileSearchBar,
+} from "./mobile-data-list";
 export {
 	Popover,
 	PopoverAnchor,

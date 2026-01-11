@@ -9,6 +9,7 @@ import {
 	TrendingUp,
 } from "lucide-react";
 import { AddTodoForm } from "@/components/features/todos/AddTodoForm";
+import { AddTodoSheet } from "@/components/features/todos/AddTodoSheet";
 import { TodoItem } from "@/components/features/todos/TodoItem";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -21,7 +22,7 @@ import {
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useTabParam } from "@/hooks";
+import { useMobile, useTabParam } from "@/hooks";
 import { api } from "../../../convex/_generated/api";
 
 export const Route = createFileRoute("/_app/todos")({
@@ -33,9 +34,10 @@ const TODO_TABS = ["all", "pending", "completed"] as const;
 function TodosPage() {
 	const todos = useQuery(api.todos.listMine);
 	const [activeTab, setActiveTab] = useTabParam("tab", TODO_TABS);
+	const isMobile = useMobile();
 
 	if (todos === undefined) {
-		return <TodosPageSkeleton />;
+		return <TodosPageSkeleton isMobile={isMobile} />;
 	}
 
 	const completedCount = todos.filter((t) => t.completed).length;
@@ -50,6 +52,114 @@ function TodosPage() {
 		return true;
 	});
 
+	// Mobile layout
+	if (isMobile) {
+		return (
+			<div className="flex flex-col">
+				{/* Mobile Header */}
+				<div className="sticky top-0 z-40 border-b bg-background/95 px-4 py-3 backdrop-blur-md supports-backdrop-blur:bg-background/80">
+					<h1 className="text-lg font-semibold">Todos</h1>
+					<p className="text-sm text-muted-foreground">
+						{pendingCount} pending, {completedCount} done
+					</p>
+				</div>
+
+				{/* Stats Summary */}
+				<div className="flex items-center gap-4 border-b bg-muted/30 px-4 py-3">
+					<div className="flex-1">
+						<div className="flex items-center justify-between text-sm">
+							<span className="text-muted-foreground">Progress</span>
+							<span className="font-medium">
+								{totalCount > 0 ? Math.round(progressPercent) : 0}%
+							</span>
+						</div>
+						<Progress value={progressPercent} className="mt-1.5 h-2" />
+					</div>
+				</div>
+
+				{/* Tabs */}
+				<Tabs
+					value={activeTab}
+					onValueChange={(value) => setActiveTab(value as typeof activeTab)}
+					className="flex-1"
+				>
+					<div className="sticky top-[73px] z-30 border-b bg-background px-4">
+						<TabsList className="h-12 w-full justify-start gap-1 rounded-none bg-transparent p-0">
+							<TabsTrigger
+								value="all"
+								className="h-full flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent"
+							>
+								All
+								{totalCount > 0 && (
+									<Badge variant="secondary" className="ml-1.5">
+										{totalCount}
+									</Badge>
+								)}
+							</TabsTrigger>
+							<TabsTrigger
+								value="pending"
+								className="h-full flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent"
+							>
+								<Circle className="mr-1 h-3 w-3" />
+								Active
+								{pendingCount > 0 && (
+									<Badge variant="secondary" className="ml-1.5">
+										{pendingCount}
+									</Badge>
+								)}
+							</TabsTrigger>
+							<TabsTrigger
+								value="completed"
+								className="h-full flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent"
+							>
+								<CheckCircle2 className="mr-1 h-3 w-3" />
+								Done
+								{completedCount > 0 && (
+									<Badge variant="secondary" className="ml-1.5">
+										{completedCount}
+									</Badge>
+								)}
+							</TabsTrigger>
+						</TabsList>
+					</div>
+
+					<TabsContent value={activeTab} className="mt-0 px-4 py-4">
+						{filteredTodos.length === 0 ? (
+							<div className="flex flex-col items-center justify-center py-12 text-center">
+								<ListTodo className="mb-4 h-12 w-12 text-muted-foreground/30" />
+								<p className="text-sm text-muted-foreground">
+									{activeTab === "all"
+										? "No todos yet. Tap + to add one!"
+										: activeTab === "pending"
+											? "No pending tasks. You're all caught up!"
+											: "No completed tasks yet. Keep going!"}
+								</p>
+							</div>
+						) : (
+							<div className="space-y-3">
+								{filteredTodos.map((todo) => (
+									<TodoItem
+										key={todo._id}
+										todoId={todo._id}
+										text={todo.text}
+										completed={todo.completed}
+										dueDate={todo.dueDate}
+										attachmentId={todo.attachmentId}
+										attachmentUrl={todo.attachmentUrl}
+									/>
+								))}
+							</div>
+						)}
+					</TabsContent>
+				</Tabs>
+
+				{/* FAB for adding todos (mobile only) */}
+				<AddTodoSheet />
+			</div>
+		);
+	}
+
+	// Desktop layout
 	return (
 		<div className="space-y-6">
 			<div>
@@ -185,7 +295,29 @@ function TodosPage() {
 	);
 }
 
-function TodosPageSkeleton() {
+function TodosPageSkeleton({ isMobile }: { isMobile: boolean }) {
+	if (isMobile) {
+		return (
+			<div className="flex flex-col">
+				<div className="border-b px-4 py-3">
+					<Skeleton className="h-6 w-24" />
+					<Skeleton className="mt-1 h-4 w-40" />
+				</div>
+				<div className="border-b px-4 py-3">
+					<Skeleton className="h-2 w-full" />
+				</div>
+				<div className="border-b px-4 py-3">
+					<Skeleton className="h-12 w-full" />
+				</div>
+				<div className="space-y-3 px-4 py-4">
+					{[1, 2, 3, 4, 5].map((i) => (
+						<Skeleton key={i} className="h-16 w-full rounded-lg" />
+					))}
+				</div>
+			</div>
+		);
+	}
+
 	return (
 		<div className="space-y-6">
 			<div>

@@ -4,6 +4,16 @@ export { useCurrentUser } from "./use-current-user";
 // State Management
 export { useDebounce, useDebouncedCallback } from "./use-debounce";
 export { type UseDialogReturn, useDialog } from "./use-dialog";
+// Mobile & PWA
+export {
+	useIsDesktopScreen,
+	useIsMobileScreen,
+	useIsStandalone,
+	useIsTabletScreen,
+	useMediaQuery,
+	useMobile,
+	usePrefersReducedMotion,
+} from "./use-mobile";
 // Server-side pagination with Convex
 export { usePaginatedTable } from "./use-paginated-table";
 export { useSyncUser } from "./use-sync-user";

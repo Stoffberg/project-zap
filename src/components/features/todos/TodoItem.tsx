@@ -129,21 +129,28 @@ export function TodoItem({
 	return (
 		<div
 			className={cn(
-				"flex items-center gap-3 rounded-lg border bg-card p-3 transition-colors hover:bg-accent/50",
+				"flex items-center gap-1 rounded-lg border bg-card p-2 transition-colors hover:bg-accent/50",
 				overdue && "border-destructive/50 bg-destructive/5",
 			)}
 		>
+			{/* Touch target wrapper - 44x44px minimum for accessibility */}
 			<button
 				type="button"
 				onClick={handleToggle}
-				className={cn(
-					"flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors",
-					completed
-						? "border-primary bg-primary text-primary-foreground"
-						: "border-muted-foreground hover:border-primary",
-				)}
+				className="flex h-11 w-11 shrink-0 items-center justify-center"
+				aria-label={completed ? "Mark as incomplete" : "Mark as complete"}
 			>
-				{completed && <Check className="h-3 w-3" />}
+				{/* Visual checkbox - smaller for aesthetics */}
+				<span
+					className={cn(
+						"flex h-5 w-5 items-center justify-center rounded-full border-2 transition-colors",
+						completed
+							? "border-primary bg-primary text-primary-foreground"
+							: "border-muted-foreground",
+					)}
+				>
+					{completed && <Check className="h-3 w-3" />}
+				</span>
 			</button>
 
 			<div className="flex-1 min-w-0">
@@ -194,18 +201,19 @@ export function TodoItem({
 				</div>
 			</div>
 
-			{/* Attachment actions */}
-			<div className="flex items-center gap-1">
+			{/* Attachment actions - 44px touch targets for mobile accessibility */}
+			<div className="flex items-center">
 				{attachmentId ? (
 					<Tooltip>
 						<TooltipTrigger asChild>
 							<Button
 								variant="ghost"
 								size="icon"
-								className="h-8 w-8 text-muted-foreground hover:text-destructive"
+								className="h-11 w-11 text-muted-foreground hover:text-destructive"
 								onClick={handleRemoveAttachment}
+								aria-label="Remove attachment"
 							>
-								<X className="h-4 w-4" />
+								<X className="h-5 w-5" />
 							</Button>
 						</TooltipTrigger>
 						<TooltipContent>Remove attachment</TooltipContent>
@@ -216,12 +224,13 @@ export function TodoItem({
 							<Button
 								variant="ghost"
 								size="icon"
-								className="h-8 w-8 text-muted-foreground hover:text-primary"
+								className="h-11 w-11 text-muted-foreground hover:text-primary"
 								onClick={() => fileInputRef.current?.click()}
 								disabled={isUploading}
+								aria-label={isUploading ? "Uploading file" : "Add attachment"}
 							>
 								<Paperclip
-									className={cn("h-4 w-4", isUploading && "animate-pulse")}
+									className={cn("h-5 w-5", isUploading && "animate-pulse")}
 								/>
 							</Button>
 						</TooltipTrigger>
@@ -242,10 +251,11 @@ export function TodoItem({
 			<Button
 				variant="ghost"
 				size="icon"
-				className="h-8 w-8 text-muted-foreground hover:text-destructive"
+				className="h-11 w-11 text-muted-foreground hover:text-destructive"
 				onClick={handleRemove}
+				aria-label="Delete todo"
 			>
-				<Trash2 className="h-4 w-4" />
+				<Trash2 className="h-5 w-5" />
 			</Button>
 		</div>
 	);

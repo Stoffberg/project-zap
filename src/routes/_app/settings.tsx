@@ -4,7 +4,9 @@ import {
 	Outlet,
 	useLocation,
 } from "@tanstack/react-router";
+import { ChevronRight, Palette, Settings, User } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useMobile } from "@/hooks";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_app/settings")({
@@ -12,14 +14,78 @@ export const Route = createFileRoute("/_app/settings")({
 });
 
 const settingsTabs = [
-	{ label: "Profile", href: "/settings" },
-	{ label: "Appearance", href: "/settings/appearance" },
-	{ label: "Notifications", href: "/settings/notifications" },
+	{ label: "Profile", href: "/settings", icon: User },
+	{ label: "Appearance", href: "/settings/appearance", icon: Palette },
+	{ label: "Notifications", href: "/settings/notifications", icon: Settings },
 ];
 
 function SettingsLayout() {
 	const location = useLocation();
+	const isMobile = useMobile();
 
+	// On mobile, show either navigation or content
+	// If we're on exactly /settings, show the navigation menu
+	// Otherwise, show the specific setting content
+	const isSettingsIndex = location.pathname === "/settings";
+
+	if (isMobile) {
+		// Show settings navigation on mobile when at /settings
+		if (isSettingsIndex) {
+			return (
+				<div className="flex flex-col">
+					{/* Mobile Header */}
+					<div className="sticky top-0 z-40 border-b bg-background/95 px-4 py-3 backdrop-blur-md supports-backdrop-blur:bg-background/80">
+						<h1 className="text-lg font-semibold">Settings</h1>
+						<p className="text-sm text-muted-foreground">
+							Manage your preferences
+						</p>
+					</div>
+
+					{/* Settings Navigation List */}
+					<div className="flex flex-col">
+						{settingsTabs.map((tab) => {
+							const Icon = tab.icon;
+							return (
+								<Link
+									key={tab.href}
+									to={tab.href}
+									className="flex items-center justify-between border-b px-4 py-4 transition-colors active:bg-accent/50"
+								>
+									<div className="flex items-center gap-3">
+										<div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
+											<Icon className="h-5 w-5 text-muted-foreground" />
+										</div>
+										<span className="font-medium">{tab.label}</span>
+									</div>
+									<ChevronRight className="h-5 w-5 text-muted-foreground" />
+								</Link>
+							);
+						})}
+					</div>
+				</div>
+			);
+		}
+
+		// Show the specific settings page with back navigation handled by browser
+		return (
+			<div className="flex flex-col">
+				{/* Mobile Header with current page name */}
+				<div className="sticky top-0 z-40 border-b bg-background/95 px-4 py-3 backdrop-blur-md supports-backdrop-blur:bg-background/80">
+					<h1 className="text-lg font-semibold">
+						{settingsTabs.find((tab) => tab.href === location.pathname)
+							?.label || "Settings"}
+					</h1>
+				</div>
+
+				{/* Settings Content */}
+				<ScrollArea className="flex-1 px-4 py-4">
+					<Outlet />
+				</ScrollArea>
+			</div>
+		);
+	}
+
+	// Desktop layout with sidebar tabs
 	return (
 		<div className="flex h-full flex-col">
 			<div className="shrink-0 pb-6">
