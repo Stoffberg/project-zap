@@ -52,11 +52,3 @@ export function useTodos() {
 		...mutations,
 	};
 }
-
-export function useTodoAttachments(todoId: Id<"todos">) {
-	const { uploadAttachment, removeAttachment } = useTodoMutations();
-	return {
-		uploadAttachment: (file: File) => uploadAttachment(todoId, file),
-		deleteAttachment: () => removeAttachment(todoId),
-	};
-}
