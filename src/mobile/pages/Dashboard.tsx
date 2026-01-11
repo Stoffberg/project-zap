@@ -67,8 +67,8 @@ export function DashboardPage() {
 
 			{/* Stats Cards */}
 			<div className="grid grid-cols-2 gap-3 px-4 py-4">
-				<Card className="border bg-card">
-					<CardContent className="flex items-center gap-3 px-3 py-2.5">
+				<Card className="gap-0 border bg-card py-0">
+					<CardContent className="flex items-center gap-3 p-3">
 						<div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber-100 dark:bg-amber-900/30">
 							<Circle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
 						</div>
@@ -78,8 +78,8 @@ export function DashboardPage() {
 						</div>
 					</CardContent>
 				</Card>
-				<Card className="border bg-card">
-					<CardContent className="flex items-center gap-3 px-3 py-2.5">
+				<Card className="gap-0 border bg-card py-0">
+					<CardContent className="flex items-center gap-3 p-3">
 						<div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-900/30">
 							<CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
 						</div>
