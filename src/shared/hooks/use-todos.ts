@@ -26,7 +26,10 @@ export interface Todo {
  */
 export function useTodos() {
 	const todosQuery = useQuery(api.todos.listMine);
-	const { data: todos, isInitialLoading } = useStableQuery(todosQuery);
+	const { data: todos, isInitialLoading } = useStableQuery(
+		todosQuery,
+		"todos:listMine",
+	);
 	const [filter, setFilter] = useState<TodoFilter>("all");
 
 	// Mutations with optimistic updates

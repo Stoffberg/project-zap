@@ -1,21 +1,30 @@
 import { useRef } from "react";
 
-export function useStableQuery<T>(queryResult: T | undefined): {
+const globalCache = new Map<string, unknown>();
+
+export function useStableQuery<T>(
+	queryResult: T | undefined,
+	cacheKey: string,
+): {
 	data: T | undefined;
 	isLoading: boolean;
 	isInitialLoading: boolean;
 } {
-	const lastData = useRef<T | undefined>(undefined);
-	const hasLoadedOnce = useRef(false);
+	const hasHydratedRef = useRef(false);
 
 	if (queryResult !== undefined) {
-		lastData.current = queryResult;
-		hasLoadedOnce.current = true;
+		globalCache.set(cacheKey, queryResult);
+		hasHydratedRef.current = true;
 	}
 
+	const cachedData = globalCache.get(cacheKey) as T | undefined;
+	const data = queryResult ?? cachedData;
+	const isInitialLoading =
+		queryResult === undefined && cachedData === undefined;
+
 	return {
-		data: queryResult ?? lastData.current,
+		data,
 		isLoading: queryResult === undefined,
-		isInitialLoading: queryResult === undefined && !hasLoadedOnce.current,
+		isInitialLoading,
 	};
 }

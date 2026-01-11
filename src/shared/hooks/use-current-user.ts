@@ -4,7 +4,7 @@ import { useStableQuery } from "./use-stable-query";
 
 export function useCurrentUser() {
 	const userQuery = useQuery(api.users.current);
-	const { data, isInitialLoading } = useStableQuery(userQuery);
+	const { data, isInitialLoading } = useStableQuery(userQuery, "users:current");
 
 	return {
 		user: data,
