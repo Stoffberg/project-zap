@@ -2,21 +2,7 @@ import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { getAuthUser, requireAuth } from "./lib/auth";
 import { validateUserName } from "./lib/validation";
-import { userRoleValidator } from "./schema";
-
-// ============================================
-// SHARED VALIDATORS
-// ============================================
-
-const userReturnValidator = v.object({
-	_id: v.id("users"),
-	_creationTime: v.number(),
-	email: v.string(),
-	name: v.string(),
-	workosUserId: v.string(),
-	avatarUrl: v.optional(v.string()),
-	role: userRoleValidator,
-});
+import { userReturnValidator } from "./lib/validators";
 
 // ============================================
 // QUERIES

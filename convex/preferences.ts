@@ -3,30 +3,7 @@ import type { Id } from "./_generated/dataModel";
 import type { MutationCtx } from "./_generated/server";
 import { mutation, query } from "./_generated/server";
 import { getAuthUser, requireAuth } from "./lib/auth";
-import { themeValidator } from "./schema";
-
-// ============================================
-// SHARED VALIDATORS
-// ============================================
-
-const preferencesReturnValidator = v.object({
-	_id: v.id("userPreferences"),
-	_creationTime: v.number(),
-	userId: v.id("users"),
-
-	// Appearance
-	theme: v.optional(themeValidator),
-	reducedMotion: v.optional(v.boolean()),
-	compactMode: v.optional(v.boolean()),
-
-	// Notifications
-	emailNotifications: v.optional(v.boolean()),
-	pushNotifications: v.optional(v.boolean()),
-	todoReminders: v.optional(v.boolean()),
-	weeklyDigest: v.optional(v.boolean()),
-	mentions: v.optional(v.boolean()),
-	marketingEmails: v.optional(v.boolean()),
-});
+import { preferencesReturnValidator, themeValidator } from "./lib/validators";
 
 // ============================================
 // HELPERS

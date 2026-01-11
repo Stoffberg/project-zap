@@ -3,27 +3,9 @@ import type { Doc, Id } from "./_generated/dataModel";
 import { internalMutation, mutation, query } from "./_generated/server";
 import { getAuthUser, requireAuth, requireOwnership } from "./lib/auth";
 import { validateTodoText } from "./lib/validation";
-import { todoPriorityValidator } from "./schema";
+import { todoPriorityValidator, todoReturnValidator } from "./lib/validators";
 
-/** 24 hours in milliseconds */
 const DEMO_TODO_MAX_AGE_MS = 24 * 60 * 60 * 1000;
-
-// ============================================
-// SHARED VALIDATORS
-// ============================================
-
-/** Todo with resolved attachment URL */
-const todoReturnValidator = v.object({
-	_id: v.id("todos"),
-	_creationTime: v.number(),
-	text: v.string(),
-	completed: v.boolean(),
-	userId: v.optional(v.id("users")),
-	dueDate: v.optional(v.number()),
-	priority: v.optional(todoPriorityValidator),
-	attachmentId: v.optional(v.id("_storage")),
-	attachmentUrl: v.optional(v.string()),
-});
 
 // ============================================
 // HELPER FUNCTIONS

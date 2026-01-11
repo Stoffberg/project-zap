@@ -8,6 +8,10 @@ import {
 	DEMO_ROLES,
 	DEMO_STATUSES,
 } from "./lib/demoData";
+import {
+	demoUserRoleValidator,
+	demoUserStatusValidator,
+} from "./lib/validators";
 
 // ============================================
 // QUERIES
@@ -156,12 +160,8 @@ export const update = mutation({
 		id: v.id("demoUsers"),
 		name: v.optional(v.string()),
 		email: v.optional(v.string()),
-		role: v.optional(
-			v.union(v.literal("admin"), v.literal("moderator"), v.literal("user")),
-		),
-		status: v.optional(
-			v.union(v.literal("active"), v.literal("inactive"), v.literal("pending")),
-		),
+		role: v.optional(demoUserRoleValidator),
+		status: v.optional(demoUserStatusValidator),
 		department: v.optional(v.string()),
 	},
 	returns: v.null(),
