@@ -4,7 +4,13 @@ import {
 	Outlet,
 	useLocation,
 } from "@tanstack/react-router";
-import { ChevronRight, Palette, Settings, User } from "lucide-react";
+import {
+	ChevronLeft,
+	ChevronRight,
+	Palette,
+	Settings,
+	User,
+} from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { useMobile } from "@/shared";
@@ -66,11 +72,17 @@ function SettingsLayout() {
 			);
 		}
 
-		// Show the specific settings page with back navigation handled by browser
+		// Show the specific settings page with back button
 		return (
 			<div className="flex flex-col">
-				{/* Mobile Header with current page name */}
-				<div className="sticky top-0 z-40 border-b bg-background/95 px-4 py-3 backdrop-blur-md supports-backdrop-blur:bg-background/80">
+				{/* Mobile Header with back button and current page name */}
+				<div className="sticky top-0 z-40 flex items-center gap-3 border-b bg-background/95 px-4 py-3 backdrop-blur-md supports-backdrop-blur:bg-background/80">
+					<Link
+						to="/settings"
+						className="-ml-2 flex h-9 w-9 items-center justify-center rounded-full transition-colors active:bg-accent"
+					>
+						<ChevronLeft className="h-6 w-6" />
+					</Link>
 					<h1 className="text-lg font-semibold">
 						{settingsTabs.find((tab) => tab.href === location.pathname)
 							?.label || "Settings"}
