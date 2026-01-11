@@ -14,7 +14,7 @@ export const Route = createFileRoute("/_app/settings")({
 });
 
 const settingsTabs = [
-	{ label: "Profile", href: "/settings", icon: User },
+	{ label: "Profile", href: "/settings/profile", icon: User },
 	{ label: "Appearance", href: "/settings/appearance", icon: Palette },
 	{ label: "Notifications", href: "/settings/notifications", icon: Settings },
 ];

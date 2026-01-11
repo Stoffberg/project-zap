@@ -170,6 +170,22 @@ This syncs `convex/auth.config.ts` to your Convex backend.
 - Dashboard layout with sidebar navigation
 - Todo app with file attachments (Convex storage demo)
 - Landing page template
+- **Full PWA support** with offline capability
+- **Mobile-first responsive design** with device detection
+
+### Mobile & PWA
+
+This template is fully optimized for mobile devices:
+
+- **Progressive Web App** - Install on home screen, works offline
+- **Device detection** - True mobile detection (not just screen size)
+- **Bottom navigation** - Native-feeling nav on mobile
+- **Sheet-based forms** - Inputs open in bottom sheets
+- **Card layouts** - Tables render as cards on mobile
+- **Touch-optimized** - 44px touch targets, no hover dependencies
+- **Safe area support** - Works on notched devices
+
+The mobile experience is intentionally different from desktop - not just responsive, but reimagined for touch.
 
 ---
 

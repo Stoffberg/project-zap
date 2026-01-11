@@ -1,6 +1,38 @@
 import { useEffect, useState } from "react";
 
 /**
+ * Non-hook utility to detect mobile device.
+ * Use in route loaders, beforeLoad, or other non-component code.
+ * Returns false during SSR.
+ */
+export function isMobileDevice(): boolean {
+	if (typeof window === "undefined") return false;
+
+	const userAgent = navigator.userAgent.toLowerCase();
+	const mobileKeywords = [
+		"android",
+		"webos",
+		"iphone",
+		"ipad",
+		"ipod",
+		"blackberry",
+		"windows phone",
+		"opera mini",
+		"mobile",
+	];
+	const hasAgentMatch = mobileKeywords.some((keyword) =>
+		userAgent.includes(keyword),
+	);
+	const hasTouch = navigator.maxTouchPoints > 0;
+	const hasCoarsePointer = window.matchMedia("(pointer: coarse)").matches;
+	const isSmallScreen = window.innerWidth < 768;
+
+	const isMobile =
+		(hasTouch && hasCoarsePointer) || (hasAgentMatch && hasTouch);
+	return isMobile || (isSmallScreen && hasTouch);
+}
+
+/**
  * Detects if the user is on a mobile DEVICE (not just screen size).
  * Uses multiple signals: user agent, touch capability, pointer type.
  *

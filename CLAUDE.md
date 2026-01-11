@@ -388,6 +388,62 @@ function TodoList() {
 
 ---
 
+# Mobile Development
+
+## Core Principles
+
+1. **Device detection over screen size** - Use `useMobile()` hook which checks user agent + touch + pointer, not just viewport width. A resized desktop window is NOT mobile.
+
+2. **Touch targets minimum 44px** - All interactive elements must have 44x44px touch area. Visual element can be smaller, wrap in larger touch target:
+```tsx
+<button className="h-11 w-11 flex items-center justify-center">
+  <span className="h-5 w-5 rounded-full border-2">...</span>
+</button>
+```
+
+3. **Inputs in sheets, not pages** - Forms open in bottom sheets (`<Sheet side="bottom">`), never inline on page. Exception: search/filter inputs.
+
+4. **No hover-dependent interactions** - Everything must work with tap. Tooltips are nice-to-have, not required.
+
+5. **16px minimum font for inputs** - Prevents iOS zoom on focus. Use `text-base` class.
+
+6. **Safe area handling** - Use `env(safe-area-inset-*)` for notched devices:
+```tsx
+style={{ paddingBottom: "calc(1rem + env(safe-area-inset-bottom, 0px))" }}
+```
+
+7. **Separate mobile layouts** - Don't just hide/show elements. Create distinct mobile experiences:
+```tsx
+if (isMobile) return <MobileLayout />;
+return <DesktopLayout />;
+```
+
+8. **Cards over tables** - Tables become card lists on mobile. Use `MobileDataList` component.
+
+9. **Bottom nav over sidebar** - Mobile uses `BottomNav`, desktop uses `Sidebar`. Never both.
+
+10. **Error feedback always visible** - Silent failures are unacceptable. Show inline errors.
+
+## Mobile Hooks
+```tsx
+import { useMobile, isMobileDevice } from "@/hooks/use-mobile";
+
+// In components (reactive)
+const isMobile = useMobile();
+
+// In route loaders (non-reactive)
+if (!isMobileDevice()) throw redirect({ to: "/desktop-route" });
+```
+
+## Mobile Components
+- `BottomNav` - Bottom navigation bar
+- `MobileHeader` - Simple page header
+- `AddTodoSheet` - FAB + sheet pattern for forms
+- `MobileDataList` - Card-based data display
+- `MobileSearchBar` - Touch-optimized search
+
+---
+
 # Lib Files Reference
 
 | File | Purpose |
