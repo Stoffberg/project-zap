@@ -20,6 +20,7 @@ export {
 	useMobile,
 	usePrefersReducedMotion,
 } from "./use-mobile";
+export { useStableQuery } from "./use-stable-query";
 export type { Todo, TodoFilter } from "./use-todos";
 // Data hooks - shared between mobile and desktop
 export { useTodoAttachments, useTodos } from "./use-todos";

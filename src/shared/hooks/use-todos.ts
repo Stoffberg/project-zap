@@ -3,6 +3,7 @@ import { startOfDay } from "date-fns";
 import { useMemo, useState } from "react";
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
+import { useStableQuery } from "./use-stable-query";
 
 export type TodoFilter = "all" | "pending" | "completed";
 
@@ -24,7 +25,8 @@ export interface Todo {
  * Contains all data fetching, filtering, and mutation logic.
  */
 export function useTodos() {
-	const todos = useQuery(api.todos.listMine);
+	const todosQuery = useQuery(api.todos.listMine);
+	const { data: todos, isInitialLoading } = useStableQuery(todosQuery);
 	const [filter, setFilter] = useState<TodoFilter>("all");
 
 	// Mutations with optimistic updates
@@ -89,10 +91,9 @@ export function useTodos() {
 	};
 
 	return {
-		// Data
 		todos: filteredTodos,
 		allTodos: todos,
-		isLoading: todos === undefined,
+		isLoading: isInitialLoading,
 
 		// Counts
 		...counts,

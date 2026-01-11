@@ -20,10 +20,10 @@ import { useCurrentUser, useTodos } from "@/shared";
  * No platform conditionals - this is purely mobile.
  */
 export function DashboardPage() {
-	const user = useCurrentUser();
+	const { user, isLoading: userLoading } = useCurrentUser();
 	const { pending, completed, total, progressPercent, isLoading } = useTodos();
 
-	if (user === undefined || isLoading) {
+	if (userLoading || isLoading) {
 		return <DashboardSkeleton />;
 	}
 
