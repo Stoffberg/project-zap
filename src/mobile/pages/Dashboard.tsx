@@ -66,25 +66,25 @@ export function DashboardPage() {
 			</div>
 
 			{/* Stats Cards */}
-			<div className="grid grid-cols-2 gap-3 px-4 pt-4">
+			<div className="grid grid-cols-2 gap-3 px-4 py-4">
 				<Card className="border bg-card">
-					<CardContent className="flex items-center gap-3 p-3">
-						<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-amber-100 dark:bg-amber-900/30">
-							<Circle className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+					<CardContent className="flex items-center gap-3 px-3 py-2.5">
+						<div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber-100 dark:bg-amber-900/30">
+							<Circle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
 						</div>
 						<div>
-							<p className="text-2xl font-bold">{pending}</p>
+							<p className="text-xl font-bold">{pending}</p>
 							<p className="text-xs text-muted-foreground">Pending</p>
 						</div>
 					</CardContent>
 				</Card>
 				<Card className="border bg-card">
-					<CardContent className="flex items-center gap-3 p-3">
-						<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-900/30">
-							<CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+					<CardContent className="flex items-center gap-3 px-3 py-2.5">
+						<div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-900/30">
+							<CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
 						</div>
 						<div>
-							<p className="text-2xl font-bold">{completed}</p>
+							<p className="text-xl font-bold">{completed}</p>
 							<p className="text-xs text-muted-foreground">Completed</p>
 						</div>
 					</CardContent>
@@ -92,7 +92,7 @@ export function DashboardPage() {
 			</div>
 
 			{/* Quick Links */}
-			<div className="px-4 pb-4">
+			<div className="px-4 pb-4 pt-2">
 				<h2 className="mb-3 flex items-center gap-2 text-sm font-semibold text-muted-foreground">
 					<Zap className="h-4 w-4" />
 					Quick Actions
