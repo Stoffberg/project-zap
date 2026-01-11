@@ -1,38 +1,16 @@
-import { useMutation } from "convex/react";
 import { startOfDay } from "date-fns";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Input } from "@/components/ui/input";
-import { api } from "../../../../convex/_generated/api";
+import { useTodoMutations } from "@/shared/hooks/use-todo-mutations";
 
 export function AddTodoForm() {
 	const [text, setText] = useState("");
 	const [dueDate, setDueDate] = useState<Date | undefined>();
 	const [isLoading, setIsLoading] = useState(false);
-
-	const addTodo = useMutation(api.todos.add).withOptimisticUpdate(
-		(localStore, args) => {
-			const existingTodos = localStore.getQuery(api.todos.listMine, {});
-			if (existingTodos !== undefined) {
-				const optimisticTodo = {
-					_id: crypto.randomUUID() as unknown as (typeof existingTodos)[0]["_id"],
-					_creationTime: Date.now(),
-					text: args.text,
-					completed: false,
-					userId: undefined,
-					dueDate: args.dueDate,
-					priority: args.priority,
-					attachmentUrl: undefined,
-				};
-				localStore.setQuery(api.todos.listMine, {}, [
-					optimisticTodo,
-					...existingTodos,
-				]);
-			}
-		},
-	);
+	const { add } = useTodoMutations();
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -41,10 +19,10 @@ export function AddTodoForm() {
 
 		setIsLoading(true);
 		try {
-			await addTodo({
-				text: trimmedText,
-				dueDate: dueDate ? startOfDay(dueDate).getTime() : undefined,
-			});
+			await add(
+				trimmedText,
+				dueDate ? startOfDay(dueDate).getTime() : undefined,
+			);
 			setText("");
 			setDueDate(undefined);
 		} catch (error) {

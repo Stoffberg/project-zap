@@ -1,4 +1,3 @@
-import { useMutation } from "convex/react";
 import {
 	AlertCircle,
 	Calendar,
@@ -17,7 +16,7 @@ import {
 } from "@/components/ui/tooltip";
 import { formatRelativeDate, isOverdue, isToday } from "@/lib/dates";
 import { cn } from "@/lib/utils";
-import { api } from "../../../../convex/_generated/api";
+import { useTodoMutations } from "@/shared/hooks/use-todo-mutations";
 import type { Id } from "../../../../convex/_generated/dataModel";
 
 interface TodoItemProps {
@@ -39,48 +38,8 @@ export function TodoItem({
 }: TodoItemProps) {
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const [isUploading, setIsUploading] = useState(false);
-
-	const toggleTodo = useMutation(api.todos.toggle).withOptimisticUpdate(
-		(localStore, args) => {
-			const existingTodos = localStore.getQuery(api.todos.listMine, {});
-			if (existingTodos !== undefined) {
-				localStore.setQuery(
-					api.todos.listMine,
-					{},
-					existingTodos.map((todo) =>
-						todo._id === args.todoId
-							? { ...todo, completed: !todo.completed }
-							: todo,
-					),
-				);
-			}
-		},
-	);
-
-	const removeTodo = useMutation(api.todos.remove).withOptimisticUpdate(
-		(localStore, args) => {
-			const existingTodos = localStore.getQuery(api.todos.listMine, {});
-			if (existingTodos !== undefined) {
-				localStore.setQuery(
-					api.todos.listMine,
-					{},
-					existingTodos.filter((todo) => todo._id !== args.todoId),
-				);
-			}
-		},
-	);
-
-	const generateUploadUrl = useMutation(api.todos.generateUploadUrl);
-	const addAttachment = useMutation(api.todos.addAttachment);
-	const removeAttachment = useMutation(api.todos.removeAttachment);
-
-	const handleToggle = () => {
-		toggleTodo({ todoId });
-	};
-
-	const handleRemove = () => {
-		removeTodo({ todoId });
-	};
+	const { toggle, remove, uploadAttachment, removeAttachment } =
+		useTodoMutations();
 
 	const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
@@ -88,39 +47,13 @@ export function TodoItem({
 
 		setIsUploading(true);
 		try {
-			// Get upload URL from Convex
-			const uploadUrl = await generateUploadUrl();
-
-			// Upload file directly to Convex storage
-			const response = await fetch(uploadUrl, {
-				method: "POST",
-				headers: { "Content-Type": file.type },
-				body: file,
-			});
-
-			if (!response.ok) {
-				throw new Error(
-					`Upload failed: ${response.status} ${response.statusText}`,
-				);
-			}
-
-			const { storageId } = await response.json();
-
-			// Link the uploaded file to the todo
-			await addAttachment({ todoId, storageId });
+			await uploadAttachment(todoId, file);
 		} catch (error) {
 			console.error("Failed to upload file:", error);
 		} finally {
 			setIsUploading(false);
-			// Reset input so same file can be selected again
-			if (fileInputRef.current) {
-				fileInputRef.current.value = "";
-			}
+			if (fileInputRef.current) fileInputRef.current.value = "";
 		}
-	};
-
-	const handleRemoveAttachment = async () => {
-		await removeAttachment({ todoId });
 	};
 
 	const overdue = dueDate && !completed && isOverdue(dueDate);
@@ -133,14 +66,12 @@ export function TodoItem({
 				overdue && "border-destructive/50 bg-destructive/5",
 			)}
 		>
-			{/* Touch target wrapper - 44x44px minimum for accessibility */}
 			<button
 				type="button"
-				onClick={handleToggle}
+				onClick={() => toggle(todoId)}
 				className="flex h-11 w-11 shrink-0 items-center justify-center"
 				aria-label={completed ? "Mark as incomplete" : "Mark as complete"}
 			>
-				{/* Visual checkbox - smaller for aesthetics */}
 				<span
 					className={cn(
 						"flex h-5 w-5 items-center justify-center rounded-full border-2 transition-colors",
@@ -201,7 +132,6 @@ export function TodoItem({
 				</div>
 			</div>
 
-			{/* Attachment actions - 44px touch targets for mobile accessibility */}
 			<div className="flex items-center">
 				{attachmentId ? (
 					<Tooltip>
@@ -210,7 +140,7 @@ export function TodoItem({
 								variant="ghost"
 								size="icon"
 								className="h-11 w-11 text-muted-foreground hover:text-destructive"
-								onClick={handleRemoveAttachment}
+								onClick={() => removeAttachment(todoId)}
 								aria-label="Remove attachment"
 							>
 								<X className="h-5 w-5" />
@@ -252,7 +182,7 @@ export function TodoItem({
 				variant="ghost"
 				size="icon"
 				className="h-11 w-11 text-muted-foreground hover:text-destructive"
-				onClick={handleRemove}
+				onClick={() => remove(todoId)}
 				aria-label="Delete todo"
 			>
 				<Trash2 className="h-5 w-5" />

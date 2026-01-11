@@ -25,7 +25,7 @@ import { useCurrentUser } from "./use-current-user";
  */
 export function useAppAuth() {
 	const { isAuthenticated, isLoading } = useConvexAuth();
-	const { user } = useCurrentUser();
+	const user = useCurrentUser();
 
 	// Actions from WorkOS
 	const { signOut } = useAuth();

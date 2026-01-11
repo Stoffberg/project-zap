@@ -1,13 +1,6 @@
 import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
-import { useStableQuery } from "./use-stable-query";
 
 export function useCurrentUser() {
-	const userQuery = useQuery(api.users.current);
-	const { data, isInitialLoading } = useStableQuery(userQuery, "users:current");
-
-	return {
-		user: data,
-		isLoading: isInitialLoading,
-	};
+	return useQuery(api.users.current);
 }

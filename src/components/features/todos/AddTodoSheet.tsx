@@ -1,4 +1,3 @@
-import { useMutation } from "convex/react";
 import { startOfDay } from "date-fns";
 import { AlertCircle, Plus } from "lucide-react";
 import { useState } from "react";
@@ -15,40 +14,15 @@ import {
 	SheetTitle,
 	SheetTrigger,
 } from "@/components/ui/sheet";
-import { api } from "../../../../convex/_generated/api";
+import { useTodoMutations } from "@/shared/hooks/use-todo-mutations";
 
-/**
- * Mobile-optimized sheet for adding todos.
- * Opens as a bottom sheet with proper input sizing.
- */
 export function AddTodoSheet() {
 	const [open, setOpen] = useState(false);
 	const [text, setText] = useState("");
 	const [dueDate, setDueDate] = useState<Date | undefined>();
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
-
-	const addTodo = useMutation(api.todos.add).withOptimisticUpdate(
-		(localStore, args) => {
-			const existingTodos = localStore.getQuery(api.todos.listMine, {});
-			if (existingTodos !== undefined) {
-				const optimisticTodo = {
-					_id: crypto.randomUUID() as unknown as (typeof existingTodos)[0]["_id"],
-					_creationTime: Date.now(),
-					text: args.text,
-					completed: false,
-					userId: undefined,
-					dueDate: args.dueDate,
-					priority: args.priority,
-					attachmentUrl: undefined,
-				};
-				localStore.setQuery(api.todos.listMine, {}, [
-					optimisticTodo,
-					...existingTodos,
-				]);
-			}
-		},
-	);
+	const { add } = useTodoMutations();
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -58,10 +32,10 @@ export function AddTodoSheet() {
 		setIsLoading(true);
 		setError(null);
 		try {
-			await addTodo({
-				text: trimmedText,
-				dueDate: dueDate ? startOfDay(dueDate).getTime() : undefined,
-			});
+			await add(
+				trimmedText,
+				dueDate ? startOfDay(dueDate).getTime() : undefined,
+			);
 			setText("");
 			setDueDate(undefined);
 			setOpen(false);
@@ -75,7 +49,6 @@ export function AddTodoSheet() {
 
 	const handleOpenChange = (newOpen: boolean) => {
 		setOpen(newOpen);
-		// Reset form when closing
 		if (!newOpen) {
 			setText("");
 			setDueDate(undefined);
@@ -126,7 +99,6 @@ export function AddTodoSheet() {
 							placeholder="What needs to be done?"
 							value={text}
 							onChange={(e) => setText(e.target.value)}
-							// 16px font prevents iOS zoom
 							className="h-12 text-base"
 							autoComplete="off"
 							autoFocus
