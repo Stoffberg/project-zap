@@ -13,19 +13,8 @@ import {
 	demoUserStatusValidator,
 } from "./lib/validators";
 
-// ============================================
-// QUERIES
-// ============================================
-
-/**
- * List demo users with pagination
- * Supports cursor-based pagination for efficient data loading
- */
 export const list = query({
-	args: {
-		paginationOpts: paginationOptsValidator,
-	},
-	// Note: Don't specify returns for paginated queries - Convex handles the type automatically
+	args: { paginationOpts: paginationOptsValidator },
 	handler: async (ctx, args) => {
 		return await ctx.db
 			.query("demoUsers")
@@ -34,15 +23,11 @@ export const list = query({
 	},
 });
 
-/**
- * Search demo users by name with pagination
- */
 export const search = query({
 	args: {
 		searchQuery: v.string(),
 		paginationOpts: paginationOptsValidator,
 	},
-	// Note: Don't specify returns for paginated queries - Convex handles the type automatically
 	handler: async (ctx, args) => {
 		if (!args.searchQuery.trim()) {
 			return await ctx.db
@@ -58,13 +43,8 @@ export const search = query({
 	},
 });
 
-/**
- * Get total count of demo users (for pagination UI)
- */
 export const count = query({
-	args: {
-		searchQuery: v.optional(v.string()),
-	},
+	args: { searchQuery: v.optional(v.string()) },
 	returns: v.number(),
 	handler: async (ctx, args) => {
 		const trimmedQuery = args.searchQuery?.trim();
@@ -81,22 +61,12 @@ export const count = query({
 	},
 });
 
-// ============================================
-// MUTATIONS
-// ============================================
-
-/**
- * Seed demo users with sample data
- */
 export const seed = mutation({
 	args: {},
 	returns: v.number(),
 	handler: async (ctx) => {
-		// Check if already seeded
 		const existing = await ctx.db.query("demoUsers").first();
-		if (existing) {
-			return 0;
-		}
+		if (existing) return 0;
 
 		const users = [];
 		for (let i = 0; i < 100; i++) {
@@ -123,9 +93,6 @@ export const seed = mutation({
 	},
 });
 
-/**
- * Clear all demo users
- */
 export const clear = mutation({
 	args: {},
 	returns: v.null(),
@@ -138,13 +105,8 @@ export const clear = mutation({
 	},
 });
 
-/**
- * Delete a single demo user
- */
 export const remove = mutation({
-	args: {
-		id: v.id("demoUsers"),
-	},
+	args: { id: v.id("demoUsers") },
 	returns: v.null(),
 	handler: async (ctx, args) => {
 		await ctx.db.delete(args.id);
@@ -152,9 +114,6 @@ export const remove = mutation({
 	},
 });
 
-/**
- * Update a demo user
- */
 export const update = mutation({
 	args: {
 		id: v.id("demoUsers"),

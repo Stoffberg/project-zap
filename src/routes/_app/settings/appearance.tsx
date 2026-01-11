@@ -25,24 +25,18 @@ type Theme = "light" | "dark" | "system";
 
 function AppearanceSettingsPage() {
 	const { theme, setTheme, resolvedTheme } = useTheme();
-	const preferences = useQuery(api.preferences.getMine);
-	const updateAppearance = useMutation(
-		api.preferences.updateAppearance,
+	const preferences = useQuery(api.preferences.get);
+	const updatePreferences = useMutation(
+		api.preferences.update,
 	).withOptimisticUpdate((localStore, args) => {
-		const existingPrefs = localStore.getQuery(api.preferences.getMine);
+		const existingPrefs = localStore.getQuery(api.preferences.get);
 		if (existingPrefs !== undefined && existingPrefs !== null) {
 			localStore.setQuery(
-				api.preferences.getMine,
+				api.preferences.get,
 				{},
 				{
 					...existingPrefs,
-					...(args.theme !== undefined && { theme: args.theme }),
-					...(args.reducedMotion !== undefined && {
-						reducedMotion: args.reducedMotion,
-					}),
-					...(args.compactMode !== undefined && {
-						compactMode: args.compactMode,
-					}),
+					...args,
 				},
 			);
 		}
@@ -61,14 +55,14 @@ function AppearanceSettingsPage() {
 
 	const handleThemeChange = (newTheme: Theme) => {
 		setTheme(newTheme);
-		updateAppearance({ theme: newTheme });
+		updatePreferences({ theme: newTheme });
 	};
 
 	const handleToggle = (
 		key: "reducedMotion" | "compactMode",
 		value: boolean,
 	) => {
-		updateAppearance({ [key]: value });
+		updatePreferences({ [key]: value });
 	};
 
 	const themeOptions = [

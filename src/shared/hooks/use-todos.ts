@@ -18,7 +18,7 @@ export interface Todo {
 }
 
 export function useTodos() {
-	const todos = useQuery(api.todos.listMine);
+	const todos = useQuery(api.todos.list);
 	const [filter, setFilter] = useState<TodoFilter>("all");
 	const mutations = useTodoMutations();
 

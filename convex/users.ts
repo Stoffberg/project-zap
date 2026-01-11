@@ -4,13 +4,6 @@ import { getAuthUser, requireAuth } from "./lib/auth";
 import { validateUserName } from "./lib/validation";
 import { userReturnValidator } from "./lib/validators";
 
-// ============================================
-// QUERIES
-// ============================================
-
-/**
- * Get current authenticated user
- */
 export const current = query({
 	args: {},
 	returns: v.union(userReturnValidator, v.null()),
@@ -19,9 +12,6 @@ export const current = query({
 	},
 });
 
-/**
- * Get user by ID
- */
 export const get = query({
 	args: { userId: v.id("users") },
 	returns: v.union(userReturnValidator, v.null()),
@@ -30,14 +20,6 @@ export const get = query({
 	},
 });
 
-// ============================================
-// MUTATIONS
-// ============================================
-
-/**
- * Upsert user from WorkOS authentication.
- * Called after successful login to sync user data.
- */
 export const upsertFromAuth = mutation({
 	args: {
 		email: v.string(),
@@ -73,13 +55,8 @@ export const upsertFromAuth = mutation({
 	},
 });
 
-/**
- * Update user profile (name only, avatar managed by WorkOS)
- */
 export const updateProfile = mutation({
-	args: {
-		name: v.optional(v.string()),
-	},
+	args: { name: v.optional(v.string()) },
 	returns: v.null(),
 	handler: async (ctx, args) => {
 		const user = await requireAuth(ctx);

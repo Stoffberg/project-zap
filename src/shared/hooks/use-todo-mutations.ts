@@ -5,10 +5,10 @@ import type { Id } from "../../../convex/_generated/dataModel";
 export function useTodoMutations() {
 	const toggleMutation = useMutation(api.todos.toggle).withOptimisticUpdate(
 		(localStore, args) => {
-			const todos = localStore.getQuery(api.todos.listMine, {});
+			const todos = localStore.getQuery(api.todos.list, {});
 			if (todos) {
 				localStore.setQuery(
-					api.todos.listMine,
+					api.todos.list,
 					{},
 					todos.map((t) =>
 						t._id === args.todoId ? { ...t, completed: !t.completed } : t,
@@ -20,10 +20,10 @@ export function useTodoMutations() {
 
 	const removeMutation = useMutation(api.todos.remove).withOptimisticUpdate(
 		(localStore, args) => {
-			const todos = localStore.getQuery(api.todos.listMine, {});
+			const todos = localStore.getQuery(api.todos.list, {});
 			if (todos) {
 				localStore.setQuery(
-					api.todos.listMine,
+					api.todos.list,
 					{},
 					todos.filter((t) => t._id !== args.todoId),
 				);
@@ -33,9 +33,9 @@ export function useTodoMutations() {
 
 	const addMutation = useMutation(api.todos.add).withOptimisticUpdate(
 		(localStore, args) => {
-			const todos = localStore.getQuery(api.todos.listMine, {});
+			const todos = localStore.getQuery(api.todos.list, {});
 			if (todos) {
-				localStore.setQuery(api.todos.listMine, {}, [
+				localStore.setQuery(api.todos.list, {}, [
 					{
 						_id: crypto.randomUUID() as unknown as Id<"todos">,
 						_creationTime: Date.now(),

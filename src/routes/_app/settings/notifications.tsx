@@ -20,33 +20,18 @@ export const Route = createFileRoute("/_app/settings/notifications")({
 });
 
 function NotificationSettingsPage() {
-	const preferences = useQuery(api.preferences.getMine);
-	const updateNotifications = useMutation(
-		api.preferences.updateNotifications,
+	const preferences = useQuery(api.preferences.get);
+	const updatePreferences = useMutation(
+		api.preferences.update,
 	).withOptimisticUpdate((localStore, args) => {
-		const existingPrefs = localStore.getQuery(api.preferences.getMine);
+		const existingPrefs = localStore.getQuery(api.preferences.get);
 		if (existingPrefs !== undefined && existingPrefs !== null) {
 			localStore.setQuery(
-				api.preferences.getMine,
+				api.preferences.get,
 				{},
 				{
 					...existingPrefs,
-					...(args.emailNotifications !== undefined && {
-						emailNotifications: args.emailNotifications,
-					}),
-					...(args.pushNotifications !== undefined && {
-						pushNotifications: args.pushNotifications,
-					}),
-					...(args.todoReminders !== undefined && {
-						todoReminders: args.todoReminders,
-					}),
-					...(args.weeklyDigest !== undefined && {
-						weeklyDigest: args.weeklyDigest,
-					}),
-					...(args.mentions !== undefined && { mentions: args.mentions }),
-					...(args.marketingEmails !== undefined && {
-						marketingEmails: args.marketingEmails,
-					}),
+					...args,
 				},
 			);
 		}
@@ -71,7 +56,7 @@ function NotificationSettingsPage() {
 		preferences?.marketingEmails ?? DEFAULT_PREFERENCES.marketingEmails;
 
 	const handleToggle = (key: string, value: boolean) => {
-		updateNotifications({ [key]: value });
+		updatePreferences({ [key]: value });
 	};
 
 	return (
