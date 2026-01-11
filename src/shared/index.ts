@@ -1,11 +1,17 @@
-/**
- * Shared module - code used by both mobile and desktop products.
- *
- * Import from here for convenience:
- * ```tsx
- * import { useTodos, withPlatform, cn } from "@/shared";
- * ```
- */
-
-export * from "./hooks";
-export * from "./lib";
+export type { Todo, TodoFilter } from "./hooks";
+export {
+	isMobileDevice,
+	useAppAuth,
+	useCurrentUser,
+	useIsDesktopScreen,
+	useIsMobileScreen,
+	useIsStandalone,
+	useIsTabletScreen,
+	useMediaQuery,
+	useMobile,
+	usePrefersReducedMotion,
+	useTodoAttachments,
+	useTodoMutations,
+	useTodos,
+} from "./hooks";
+export { cn } from "./lib";

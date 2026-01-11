@@ -106,35 +106,6 @@ export const get = query({
 	},
 });
 
-/**
- * List todos for a specific user (by userId)
- * Requires authentication and ownership (or admin role)
- */
-export const listByUser = query({
-	args: { userId: v.id("users") },
-	returns: v.array(todoReturnValidator),
-	handler: async (ctx, args) => {
-		const user = await getAuthUser(ctx);
-		if (!user) {
-			return [];
-		}
-
-		// Only allow users to view their own todos (or admins)
-		if (user._id !== args.userId && user.role !== "admin") {
-			return [];
-		}
-
-		const todos = await ctx.db
-			.query("todos")
-			.withIndex("by_userId", (q) => q.eq("userId", args.userId))
-			.order("desc")
-			.collect();
-
-		// Resolve attachment URLs
-		return Promise.all(todos.map((todo) => resolveAttachmentUrl(ctx, todo)));
-	},
-});
-
 // ============================================
 // MUTATIONS
 // ============================================
@@ -189,55 +160,6 @@ export const toggle = mutation({
 		await ctx.db.patch(args.todoId, {
 			completed: !todo.completed,
 		});
-
-		return null;
-	},
-});
-
-/**
- * Update todo fields (text, completed, dueDate, priority)
- * Requires ownership for user todos (demo todos are public)
- */
-export const update = mutation({
-	args: {
-		todoId: v.id("todos"),
-		text: v.optional(v.string()),
-		completed: v.optional(v.boolean()),
-		dueDate: v.optional(v.union(v.number(), v.null())),
-		priority: v.optional(v.union(todoPriorityValidator, v.null())),
-	},
-	returns: v.null(),
-	handler: async (ctx, args) => {
-		const todo = await ctx.db.get(args.todoId);
-		if (!todo) {
-			throw new ConvexError("NOT_FOUND");
-		}
-
-		// For user todos, verify ownership
-		if (todo.userId) {
-			const user = await requireAuth(ctx);
-			requireOwnership(user, todo.userId);
-		}
-
-		const updates: Partial<{
-			text: string;
-			completed: boolean;
-			dueDate: number | undefined;
-			priority: "low" | "medium" | "high" | undefined;
-		}> = {};
-
-		// Validate text if provided
-		if (args.text !== undefined) {
-			updates.text = validateTodoText(args.text);
-		}
-		if (args.completed !== undefined) updates.completed = args.completed;
-		if (args.dueDate !== undefined) updates.dueDate = args.dueDate ?? undefined;
-		if (args.priority !== undefined)
-			updates.priority = args.priority ?? undefined;
-
-		if (Object.keys(updates).length > 0) {
-			await ctx.db.patch(args.todoId, updates);
-		}
 
 		return null;
 	},
