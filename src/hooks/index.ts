@@ -5,6 +5,5 @@ export {
 	useMobile,
 } from "@/shared";
 
-export { useDebounce, useDebouncedCallback } from "./use-debounce";
-export { type UseDialogReturn, useDialog } from "./use-dialog";
+export { useDebounce } from "./use-debounce";
 export { useSyncUser } from "./use-sync-user";

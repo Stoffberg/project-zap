@@ -5,26 +5,10 @@ import { AuthError } from "./errors";
 
 export { AuthError };
 
-// ============================================
-// TYPES
-// ============================================
-
 export type AuthenticatedUser = Doc<"users">;
 
 type AuthContext = QueryCtx | MutationCtx;
 
-// ============================================
-// AUTH HELPERS
-// ============================================
-
-/**
- * Get the current authenticated user.
- * Returns null if not authenticated or user not found.
- *
- * @example
- * const user = await getAuthUser(ctx);
- * if (!user) return []; // Handle unauthenticated
- */
 export async function getAuthUser(
 	ctx: AuthContext,
 ): Promise<AuthenticatedUser | null> {
@@ -37,13 +21,6 @@ export async function getAuthUser(
 		.unique();
 }
 
-/**
- * Require authentication - throws if not authenticated.
- *
- * @example
- * const user = await requireAuth(ctx);
- * // user is guaranteed to exist
- */
 export async function requireAuth(
 	ctx: AuthContext,
 ): Promise<AuthenticatedUser> {
@@ -64,29 +41,11 @@ export async function requireAuth(
 	return user;
 }
 
-/**
- * Require ownership of a resource - throws FORBIDDEN if not owner.
- *
- * @example
- * requireOwnership(user, todo.userId);
- */
 export function requireOwnership(
 	user: AuthenticatedUser,
 	resourceOwnerId: Id<"users"> | undefined,
 ): void {
 	if (resourceOwnerId !== user._id) {
-		throw new ConvexError(AuthError.FORBIDDEN);
-	}
-}
-
-/**
- * Require a specific role - throws FORBIDDEN if not matching.
- */
-export function requireRole(
-	user: AuthenticatedUser,
-	role: Doc<"users">["role"],
-): void {
-	if (user.role !== role) {
 		throw new ConvexError(AuthError.FORBIDDEN);
 	}
 }
